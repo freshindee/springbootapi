@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class RestservicesApplication {
-
+// test comment added
 	public static void main(String[] args) {
 		SpringApplication.run(RestservicesApplication.class, args);
 	}

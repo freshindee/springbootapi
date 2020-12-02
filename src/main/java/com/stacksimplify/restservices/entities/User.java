@@ -8,7 +8,7 @@
 	//Entity 
 	// and
 	@Entity  
-	@Table(name = "user")
+	@Table(name = "usernew")
 	public class User {
 	
 		@Id
@@ -33,6 +33,35 @@
 		@Column(name = "SSN", length = 50, nullable = false, unique = true)
 		private String ssn;
 	
+		
+//		@Column(name = "name", length = 50, nullable = false, unique = true)
+//		private String name;
+//	
+//		@Column(name = "username", length = 50, nullable = false)
+//		private String username;
+//	
+//		@Column(name = "password", length = 50, nullable = false)
+//		private String password;
+//	
+//		@Column(name = "email_address", length = 50, nullable = false)
+//		private String email;
+//		
+//		@Column(name = "phone", length = 50, nullable = false)
+//		private String phone;
+//		
+//		@Column(name = "delivery_address", length = 50, nullable = false)
+//		private String delivery_address;
+//		
+//		@Column(name = "is_email_verified", length = 1, nullable = false)
+//		private Boolean is_email_verified;
+//		
+//		@Column(name = "status_id", length = 11, nullable = false)
+//		private Integer status_id;
+//	
+//		@Column(name = "password_expiry", length = 50, nullable = false)
+//		private DATETIME password_expiry;
+		
+		
 		// No Argument Constructor
 		public User() {
 		}

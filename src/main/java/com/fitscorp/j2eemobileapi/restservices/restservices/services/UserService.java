@@ -33,7 +33,7 @@ public class UserService {
 	// CreateUser Method
 	public User createUser(User user) throws UserExistsException{
 		//if user exist using username
-		User existingUser = userRepository.findByUsername(user.getUsername());
+		User existingUser = userRepository.findByEmail(user.getEmail());
 	
 		//if not exists throw UserExistsException
 		if(existingUser != null) {
@@ -45,7 +45,7 @@ public class UserService {
 	}
 
 	// getUserById
-	public Optional<User> getUserById(Long id) throws UserNotFoundException {
+	public Optional<User> getUserByUserId(Long id) throws UserNotFoundException {
 		Optional<User> user = userRepository.findById(id);
 
 		if (!user.isPresent()) {
@@ -64,7 +64,7 @@ public class UserService {
 		}
 
 		
-		user.setId(id);
+		user.setUserId(id);
 		return userRepository.save(user);
 
 	}
@@ -81,8 +81,8 @@ public class UserService {
 
 	// getUserByUsername
 
-	public User getUserByUsername(String username) {
-		return userRepository.findByUsername(username);
+	public User getUserByEmail(String emai) {
+		return userRepository.findByEmail(emai);
 	}
 
 }

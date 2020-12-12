@@ -7,88 +7,54 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-//Entity 
-// and
 @Entity
 @Table(name = "user")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	@Column(name = "username", length = 50, nullable = false, unique = true)
-	private String username;
+	@Column(name = "id", length = 50, nullable = false, unique = true)
+	private Long userId;
 
 	@Column(name = "name", length = 50, nullable = false)
 	private String name;
 
-	@Column(name = "first_name", length = 50, nullable = false)
-	private String firstname;
+	@Column(name = "phone", length = 50, nullable = false, unique = true)
+	private String phoneNo;
 
-	@Column(name = "last_name", length = 50, nullable = false)
-	private String lastname;
-
-	@Column(name = "phone", length = 50, nullable = false)
-	private String phone;
-
-	@Column(name = "email_address", length = 50, nullable = false)
+	@Column(name = "email_address", length = 50, nullable = false, unique = true)
 	private String email;
 
-	@Column(name = "delivery_address", length = 50, nullable = false)
-	private String delivery_address;
+	@Column(name = "delivery_address", length = 50, nullable = true)
+	private String address;
 
-	@Column(name = "role", length = 50, nullable = false)
-	private String role;
+	@Column(name = "status_id", length = 50, nullable = false)
+	private int passwordStatus;
 
-	@Column(name = "status_id", length = 50, nullable = false, unique = true)
-	private String status_id;
-
-	@Column(name = "ssn", length = 50, nullable = false, unique = true)
-	private String ssn;
-
-	@Column(name = "created_by", length = 50, nullable = false, unique = true)
-	private String createdBy;
-
-	@Column(name = "created_date", length = 50, nullable = false, unique = true)
-	private String createdDate;
-
+	@Column(name = "enabled", length = 50, nullable = false)
+	private int status;
 	
 	public User() {
 	}
 
-	public User(Long id, String username, String name, String firstname, String lastname, String phone, String email,
-			String delivery_address, String role, String status_id, String ssn, String createdBy, String createdDate) {
+	public User(Long userId, String name, String phoneNo, String email, String address, int passwordStatus,
+			int status) {
 		super();
-		this.id = id;
-		this.username = username;
+		this.userId = userId;
 		this.name = name;
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.phone = phone;
+		this.phoneNo = phoneNo;
 		this.email = email;
-		this.delivery_address = delivery_address;
-		this.role = role;
-		this.status_id = status_id;
-		this.ssn = ssn;
-		this.createdBy = createdBy;
-		this.createdDate = createdDate;
+		this.address = address;
+		this.passwordStatus = passwordStatus;
+		this.status = status;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 	public String getName() {
@@ -99,28 +65,12 @@ public class User {
 		this.name = name;
 	}
 
-	public String getFirstname() {
-		return firstname;
+	public String getPhoneNo() {
+		return phoneNo;
 	}
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-
-	public String getLastname() {
-		return lastname;
-	}
-
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
 	}
 
 	public String getEmail() {
@@ -131,60 +81,34 @@ public class User {
 		this.email = email;
 	}
 
-	public String getDelivery_address() {
-		return delivery_address;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setDelivery_address(String delivery_address) {
-		this.delivery_address = delivery_address;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public String getRole() {
-		return role;
+	public int getPasswordStatus() {
+		return passwordStatus;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setPasswordStatus(int passwordStatus) {
+		this.passwordStatus = passwordStatus;
 	}
 
-	public String getStatus_id() {
-		return status_id;
+	public int getStatus() {
+		return status;
 	}
 
-	public void setStatus_id(String status_id) {
-		this.status_id = status_id;
-	}
-
-	public String getSsn() {
-		return ssn;
-	}
-
-	public void setSsn(String ssn) {
-		this.ssn = ssn;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public String getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(String createdDate) {
-		this.createdDate = createdDate;
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", name=" + name + ", firstname=" + firstname
-				+ ", lastname=" + lastname + ", phone=" + phone + ", email=" + email + ", delivery_address="
-				+ delivery_address + ", role=" + role + ", status_id=" + status_id + ", ssn=" + ssn + ", createdBy="
-				+ createdBy + ", createdDate=" + createdDate + "]";
+		return "User [userId=" + userId + ", name=" + name + ", phoneNo=" + phoneNo + ", email=" + email + ", address="
+				+ address + ", passwordStatus=" + passwordStatus + ", status=" + status + "]";
 	}
 
 }

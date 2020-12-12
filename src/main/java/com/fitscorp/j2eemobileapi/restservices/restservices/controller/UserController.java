@@ -2,7 +2,9 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.controller;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -50,7 +53,7 @@ public class UserController {
 		try {
 			userService.createUser(user);
 			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(builder.path("/users/{id}").buildAndExpand(user.getId()).toUri());
+			headers.setLocation(builder.path("/users/{id}").buildAndExpand(user.getUserId()).toUri());
 			return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
 			
 		} catch(UserExistsException ex) {
@@ -60,10 +63,10 @@ public class UserController {
 
 	// getUserById
 	@GetMapping("/users/{id}")
-	public Optional<User> getUserById(@PathVariable("id") Long id) {
+	public Optional<User> getUserByUserId(@PathVariable("id") Long id) {
 
 		try {
-			return userService.getUserById(id);
+			return userService.getUserByUserId(id);
 		} catch (UserNotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
 		}
@@ -84,14 +87,21 @@ public class UserController {
 
 	// deleteUserById
 	@DeleteMapping("/users/{id}")
-	public void deleteUserById(@PathVariable("id") Long id) {
+	public void deleteUserByUserId(@PathVariable("id") Long id) {
 		userService.deleteUserById(id);
 	}
 
-	// getUserByUsername
-	@GetMapping("/users/byusername/{username}")
-	public User getUserByUsername(@PathVariable("username") String username) {
-		return userService.getUserByUsername(username);
+	// getUserByEmail
+	@GetMapping(path = "/users", params = "email")
+	public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
+		try {
+			User user = userService.getUserByEmail(email);
+			if (user == null)
+				throw new NoSuchElementException();
+			return new ResponseEntity<User>(user, HttpStatus.OK);
+		} catch (NoSuchElementException e) {
+	        List<String> errors = new ArrayList<String>();
+			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+		}
 	}
-
 }

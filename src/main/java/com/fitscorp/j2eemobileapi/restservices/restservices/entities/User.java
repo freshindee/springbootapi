@@ -1,86 +1,76 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-//Entity 
-// and
-@Entity  
-@Table(name = "usernew")
+
+@Entity
+@Table(name = "user")
 public class User {
 
 	@Id
-	@GeneratedValue
-	private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", length = 50, nullable = false, unique = true)
+	private Long userId;
 
-	@Column(name = "USER_NAME", length = 50, nullable = false, unique = true)
-	private String username;
+	@Column(name = "name", length = 50, nullable = false)
+	private String name;
 
-	@Column(name = "FIRST_NAME", length = 50, nullable = false)
-	private String firstname;
+	@Column(name = "phone", length = 50, nullable = false, unique = true)
+	private String phoneNo;
 
-	@Column(name = "LAST_NAME", length = 50, nullable = false)
-	private String lastname;
-
-	@Column(name = "EMAIL_ADDRESS", length = 50, nullable = false)
+	@Column(name = "email_address", length = 50, nullable = false, unique = true)
 	private String email;
 
-	@Column(name = "ROLE", length = 50, nullable = false)
-	private String role;
+	@Column(name = "delivery_address", length = 50, nullable = true)
+	private String address;
 
-	@Column(name = "SSN", length = 50, nullable = false, unique = true)
-	private String ssn;
+	@Column(name = "status_id", length = 50, nullable = false)
+	private int passwordStatus;
 
+	@Column(name = "enabled", length = 50, nullable = false)
+	private int status;
 	
-	// No Argument Constructor
 	public User() {
 	}
 
-	// Fields Constructor
-	public User(Long id, String username, String firstname, String lastname, String email, String role, String ssn) {
-		this.id = id;
-		this.username = username;
-		this.firstname = firstname;
-		this.lastname = lastname;
+	public User(Long userId, String name, String phoneNo, String email, String address, int passwordStatus,
+			int status) {
+		super();
+		this.userId = userId;
+		this.name = name;
+		this.phoneNo = phoneNo;
 		this.email = email;
-		this.role = role;
-		this.ssn = ssn;
+		this.address = address;
+		this.passwordStatus = passwordStatus;
+		this.status = status;
 	}
 
-	// Getters and Setters
-	public Long getId() {
-		return id;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getName() {
+		return name;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getFirstname() {
-		return firstname;
+	public String getPhoneNo() {
+		return phoneNo;
 	}
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-
-	public String getLastname() {
-		return lastname;
-	}
-
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
 	}
 
 	public String getEmail() {
@@ -91,27 +81,34 @@ public class User {
 		this.email = email;
 	}
 
-	public String getRole() {
-		return role;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public String getSsn() {
-		return ssn;
+	public int getPasswordStatus() {
+		return passwordStatus;
 	}
 
-	public void setSsn(String ssn) {
-		this.ssn = ssn;
+	public void setPasswordStatus(int passwordStatus) {
+		this.passwordStatus = passwordStatus;
 	}
 
-	// To String
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", firstname=" + firstname + ", lastname=" + lastname
-				+ ", email=" + email + ", role=" + role + ", ssn=" + ssn + "]";
+		return "User [userId=" + userId + ", name=" + name + ", phoneNo=" + phoneNo + ", email=" + email + ", address="
+				+ address + ", passwordStatus=" + passwordStatus + ", status=" + status + "]";
 	}
-	
+
 }

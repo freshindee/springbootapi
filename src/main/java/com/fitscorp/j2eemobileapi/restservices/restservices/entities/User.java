@@ -1,21 +1,29 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "user")
+@Where(clause = "enabled= '1'")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", length = 50, nullable = false, unique = true)
 	private Long userId;
-
+	
 	@Column(name = "name", length = 50, nullable = false)
 	private String name;
 
@@ -33,13 +41,16 @@ public class User {
 
 	@Column(name = "enabled", length = 50, nullable = false)
 	private int status;
-	
+	@OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "user_id")
+	@Where(clause = "enabled= '1'")
+	private UserToken tokens;
+
 	public User() {
 	}
 
-	public User(Long userId, String name, String phoneNo, String email, String address, int passwordStatus,
-			int status) {
-		super();
+	public User(Long userId, String name, String phoneNo, String email, String address, int passwordStatus, int status, 
+			UserToken tokens) {
 		this.userId = userId;
 		this.name = name;
 		this.phoneNo = phoneNo;
@@ -47,6 +58,7 @@ public class User {
 		this.address = address;
 		this.passwordStatus = passwordStatus;
 		this.status = status;
+		this.tokens = tokens;
 	}
 
 	public Long getUserId() {
@@ -105,10 +117,13 @@ public class User {
 		this.status = status;
 	}
 
-	@Override
-	public String toString() {
-		return "User [userId=" + userId + ", name=" + name + ", phoneNo=" + phoneNo + ", email=" + email + ", address="
-				+ address + ", passwordStatus=" + passwordStatus + ", status=" + status + "]";
+	public UserToken getTokens() {
+		return tokens;
 	}
 
+	public void setTokens(UserToken tokens) {
+		this.tokens = tokens;
+	}
+	
+	
 }

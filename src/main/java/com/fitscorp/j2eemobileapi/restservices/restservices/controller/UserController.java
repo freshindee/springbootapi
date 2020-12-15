@@ -1,7 +1,5 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.controller;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,10 +22,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserNotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserService;
-
-
 
 //Controller -
 @RestController
@@ -40,9 +36,7 @@ public class UserController {
 	// getAllUsers Method
 	@GetMapping("/users")
 	public List<User> getAllUsers() {
-
 		return userService.getAllUsers();
-
 	}
 
 	// Create User Method
@@ -67,7 +61,7 @@ public class UserController {
 
 		try {
 			return userService.getUserByUserId(id);
-		} catch (UserNotFoundException ex) {
+		} catch (NotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
 		}
 
@@ -79,7 +73,7 @@ public class UserController {
 
 		try {
 			return userService.updateUserById(id, user);
-		} catch (UserNotFoundException ex) {
+		} catch (NotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
 		}
 

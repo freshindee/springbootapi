@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserNotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserRepository;
 
 
@@ -45,22 +45,22 @@ public class UserService {
 	}
 
 	// getUserById
-	public Optional<User> getUserByUserId(Long id) throws UserNotFoundException {
+	public Optional<User> getUserByUserId(Long id) throws NotFoundException {
 		Optional<User> user = userRepository.findById(id);
 
 		if (!user.isPresent()) {
-			throw new UserNotFoundException("User Not found in user Repository");
+			throw new NotFoundException("User Not found in user Repository");
 		}
 
 		return user;
 	}
 
 	// updateUserById
-	public User updateUserById(Long id, User user) throws UserNotFoundException {
+	public User updateUserById(Long id, User user) throws NotFoundException {
 		Optional<User> optionalUser = userRepository.findById(id);
 
 		if (!optionalUser.isPresent()) {
-			throw new UserNotFoundException("User Not found in user Repository, provide the correct user id");
+			throw new NotFoundException("User Not found in user Repository, provide the correct user id");
 		}
 
 		

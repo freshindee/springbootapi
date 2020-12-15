@@ -1,12 +1,12 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.exceptions;
 
 
-public class UserNotFoundException  extends Exception {
+public class NotFoundException  extends Exception {
 
 
 	private static final long serialVersionUID = 1L;
 
-	public UserNotFoundException(String message) {
+	public NotFoundException(String message) {
 		super(message);
 		}
 	

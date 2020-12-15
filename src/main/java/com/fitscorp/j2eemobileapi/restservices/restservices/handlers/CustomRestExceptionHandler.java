@@ -173,7 +173,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("error", ex);
 
         System.out.println(ex.getLocalizedMessage());
-        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "error occurred");
+        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Internal server error");
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 

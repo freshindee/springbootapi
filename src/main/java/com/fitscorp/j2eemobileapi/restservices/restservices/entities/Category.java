@@ -1,35 +1,39 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
 import java.io.Serializable;
-import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
+import java.util.Date;
 /**
  *
  * @author User
  */
 @Entity
-@Table(name = "user_token")
+@Table(name = "category")
 @NamedQueries({
-    @NamedQuery(name = "UserToken.findAll", query = "SELECT u FROM UserToken u")})
-public class UserToken implements Serializable {
+    @NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c")})
+public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -37,10 +41,10 @@ public class UserToken implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "access_token")
-    private String accessToken;
-    @Column(name = "status")
-    private Integer status;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "store_id")
+    private Integer storeId;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_date")
@@ -53,35 +57,17 @@ public class UserToken implements Serializable {
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Long userId;
-//    @JoinColumn(name = "user_id", referencedColumnName = "id")
-//    @ManyToOne(optional = false)
-//    private User user;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
+    private List<SubCategory> subCategoryList;
 
-    public UserToken() {
+    public Category() {
     }
-    
-    public UserToken(Long id) {
+
+    public Category(Long id) {
         this.id = id;
     }
 
-    public UserToken(Long id, String accessToken, Integer status, String createdBy, Date createdDate, Boolean enabled,
-			String modifiedBy, Date modifiedDate, Long userId) {
-		super();
-		this.id = id;
-		this.accessToken = accessToken;
-		this.status = status;
-		this.createdBy = createdBy;
-		this.createdDate = createdDate;
-		this.enabled = enabled;
-		this.modifiedBy = modifiedBy;
-		this.modifiedDate = modifiedDate;
-		this.userId = userId;
-//		this.user = user;
-	}
-
-	public Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -89,20 +75,20 @@ public class UserToken implements Serializable {
         this.id = id;
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public String getName() {
+        return name;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Integer getStoreId() {
+        return storeId;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setStoreId(Integer storeId) {
+        this.storeId = storeId;
     }
 
     public String getCreatedBy() {
@@ -145,21 +131,13 @@ public class UserToken implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
-    public Long getUserId() {
-		return userId;
-	}
+    public List<SubCategory> getSubCategoryList() {
+        return subCategoryList;
+    }
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-//	public User getUser() {
-//        return user;
-//    }
-//
-//    public void setUser(User user) {
-//        this.user = user;
-//    }
+    public void setSubCategoryList(List<SubCategory> subCategoryList) {
+        this.subCategoryList = subCategoryList;
+    }
 
     @Override
     public int hashCode() {
@@ -171,10 +149,10 @@ public class UserToken implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof UserToken)) {
+        if (!(object instanceof Category)) {
             return false;
         }
-        UserToken other = (UserToken) object;
+        Category other = (Category) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -183,7 +161,7 @@ public class UserToken implements Serializable {
 
     @Override
     public String toString() {
-        return "com.fitscorp.j2eemobileapi.restservices.entities.UserToken[ id=" + id + " ]";
+        return "com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category[ id=" + id + " ]";
     }
     
 }

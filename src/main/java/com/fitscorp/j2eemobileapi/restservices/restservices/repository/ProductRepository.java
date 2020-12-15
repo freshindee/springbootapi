@@ -4,15 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 
 
 
-//Repository
 @Repository
-public interface UserRepository  extends JpaRepository<User, Long>{
+public interface ProductRepository  extends JpaRepository<Product, Long>{
 
-	User findByEmail(String email);
+	//Product fi(String username);
 }
-
-

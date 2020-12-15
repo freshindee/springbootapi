@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
@@ -19,17 +19,20 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserRepos
 @Service
 public class UserService {
 
-	// Autowire the UserRepository
+	
 	@Autowired
 	private UserRepository userRepository;
+	
+	
 
+	
 	// getAllUsers Method
 	public List<User> getAllUsers() {
-
 		return userRepository.findAll();
-
 	}
 
+	
+	
 	// CreateUser Method
 	public User createUser(User user) throws UserExistsException{
 		//if user exist using username
@@ -40,7 +43,19 @@ public class UserService {
 			throw new UserExistsException("User already exists in repository");
 		}
 		
-	
+//		User existingUser = userRepository.findByUsername(user.getEmail_address());
+//	
+//		//if not exists throw UserExistsException
+//		if(existingUser != null) {
+//			throw new UserExistsException("User already exists in repository");
+//		}
+//		
+//		int strength = 10; // work factor of bcrypt
+//		PasswordEncoder bCryptPasswordEncoder =
+//		  new PasswordEncoder(strength, new SecureRandom());
+//		 String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+		 
+		// user.setPassword(encodedPassword);
 		return userRepository.save(user);
 	}
 

@@ -1,6 +1,5 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.services;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +13,6 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExist
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserTokenRepository;
 
-
-//Service
 @Service
 public class UserTokenService {
 
@@ -30,7 +27,7 @@ public class UserTokenService {
 	}
 
 	public UserToken createUserToken(UserToken userToken) throws UserExistsException{
-		UserToken existingUserToken = userTokenRepository.findByUserId(userToken.getUserId());
+		UserToken existingUserToken = userTokenRepository.findByUserId(userToken.getId());
 	
 		//if not exists throw UserExistsException
 		if(existingUserToken != null) {
@@ -59,7 +56,7 @@ public class UserTokenService {
 		}
 
 		
-		userToken.setUserId(id);
+		userToken.setId(id);
 		return userTokenRepository.save(userToken);
 
 	}

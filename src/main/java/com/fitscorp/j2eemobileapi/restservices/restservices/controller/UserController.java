@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
@@ -29,20 +30,16 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserService
 @RestController
 public class UserController {
 
-	// Autowire the UserService
 	@Autowired
 	private UserService userService;
 
-	// getAllUsers Method
 	@GetMapping("/users")
 	public List<User> getAllUsers() {
 		return userService.getAllUsers();
 	}
-
-	// Create User Method
-	// @RequestBody Annotation
-	// @PostMapping Annotation
-	@PostMapping("/users")
+	
+	// Register User Method
+	@PostMapping("/registrations")
 	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder builder) {
 		try {
 			userService.createUser(user);
@@ -55,7 +52,6 @@ public class UserController {
 		}
 	}
 
-	// getUserById
 	@GetMapping("/users/{id}")
 	public Optional<User> getUserByUserId(@PathVariable("id") Long id) {
 
@@ -67,7 +63,6 @@ public class UserController {
 
 	}
 
-	// updateUserById
 	@PutMapping("/users/{id}")
 	public User updateUserById(@PathVariable("id") Long id, @RequestBody User user) {
 
@@ -79,13 +74,11 @@ public class UserController {
 
 	}
 
-	// deleteUserById
 	@DeleteMapping("/users/{id}")
 	public void deleteUserByUserId(@PathVariable("id") Long id) {
 		userService.deleteUserById(id);
 	}
 
-	// getUserByEmail
 	@GetMapping(path = "/users", params = "email")
 	public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
 		try {

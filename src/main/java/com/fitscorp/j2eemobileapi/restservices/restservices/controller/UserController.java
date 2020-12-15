@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserNotFoundException;
@@ -37,15 +38,15 @@ public class UserController {
 	// getAllUsers Method
 	@GetMapping("/users")
 	public List<User> getAllUsers() {
-
 		return userService.getAllUsers();
 
 	}
 
-	// Create User Method
-	// @RequestBody Annotation
-	// @PostMapping Annotation
-	@PostMapping("/users")
+	
+
+	
+	// Register User Method
+	@PostMapping("/registrations")
 	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder builder) {
 		try {
 			userService.createUser(user);
@@ -59,7 +60,7 @@ public class UserController {
 	}
 
 	// getUserById
-	@GetMapping("/users/{id}")
+	@GetMapping("/users/{id}/info")
 	public Optional<User> getUserById(@PathVariable("id") Long id) {
 
 		try {

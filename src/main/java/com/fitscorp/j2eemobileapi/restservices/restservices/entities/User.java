@@ -1,6 +1,8 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,54 +11,97 @@ import javax.persistence.Table;
 //Entity 
 // and
 @Entity  
-@Table(name = "usernew")
+@Table(name = "user")
 public class User {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@Column(name = "USER_NAME", length = 50, nullable = false, unique = true)
+	@Column(name = "name", length = 255, nullable = true)
+	private String name;
+
+	@Column(name = "username", length = 255, nullable = true)
 	private String username;
 
-	@Column(name = "FIRST_NAME", length = 50, nullable = false)
-	private String firstname;
+	@Column(name = "password", length = 255, nullable = true)
+	private String password;
 
-	@Column(name = "LAST_NAME", length = 50, nullable = false)
-	private String lastname;
+	@Column(name = "phone", length = 12, nullable = true)
+	private String phone;
 
-	@Column(name = "EMAIL_ADDRESS", length = 50, nullable = false)
-	private String email;
+	@Column(name = "delivery_address", length = 255, nullable = true)
+	private String delivery_address;
 
-	@Column(name = "ROLE", length = 50, nullable = false)
-	private String role;
+	@Column(name = "email_address", length = 255, nullable = true)
+	private String email_address;
 
-	@Column(name = "SSN", length = 50, nullable = false, unique = true)
-	private String ssn;
-
+	@Column(name = "is_email_verified", nullable = true)
+	private Boolean is_email_verified;
 	
+	@Column(name = "status_id", length = 3, nullable = true)
+	private int status_id;
+	
+	@Column(name = "created_by", length = 255, nullable = true)
+	private String created_by;
+	
+	@Column(name = "password_expiry", length = 255, nullable = true)
+	private Date password_expiry;
+	
+	@Column(name = "created_date", length = 255, nullable = true)
+	private String created_date;
+	
+	@Column(name = "modified_by", length = 255, nullable = true)
+	private String modified_by;
+	
+	@Column(name = "enabled",  nullable = true)
+	private Boolean enabled;
+	
+	@Column(name = "modified_date", length = 255, nullable = true)
+	private Date modified_date;
+
+	 
 	// No Argument Constructor
 	public User() {
 	}
 
 	// Fields Constructor
-	public User(Long id, String username, String firstname, String lastname, String email, String role, String ssn) {
-		this.id = id;
-		this.username = username;
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.email = email;
-		this.role = role;
-		this.ssn = ssn;
-	}
+	
 
 	// Getters and Setters
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public User(Long id, String name, String username, String password, String phone, String delivery_address,
+			String email_address, Boolean is_email_verified, int status_id, String created_by, Date password_expiry,
+			String created_date, String modified_by, Boolean enabled, Date modified_date) {
+		super();
 		this.id = id;
+		this.name = name;
+		this.username = username;
+		this.password = password;
+		this.phone = phone;
+		this.delivery_address = delivery_address;
+		this.email_address = email_address;
+		this.is_email_verified = is_email_verified;
+		this.status_id = status_id;
+		this.created_by = created_by;
+		this.password_expiry = password_expiry;
+		this.created_date = created_date;
+		this.modified_by = modified_by;
+		this.enabled = enabled;
+		this.modified_date = modified_date;
+	}
+
+
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getUsername() {
@@ -67,51 +112,116 @@ public class User {
 		this.username = username;
 	}
 
-	public String getFirstname() {
-		return firstname;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
-	public String getLastname() {
-		return lastname;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getDelivery_address() {
+		return delivery_address;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setDelivery_address(String delivery_address) {
+		this.delivery_address = delivery_address;
 	}
 
-	public String getRole() {
-		return role;
+	public String getEmail_address() {
+		return email_address;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setEmail_address(String email_address) {
+		this.email_address = email_address;
 	}
 
-	public String getSsn() {
-		return ssn;
+	public Boolean getIs_email_verified() {
+		return is_email_verified;
 	}
 
-	public void setSsn(String ssn) {
-		this.ssn = ssn;
+	public void setIs_email_verified(Boolean is_email_verified) {
+		this.is_email_verified = is_email_verified;
+	}
+
+	public int getStatus_id() {
+		return status_id;
+	}
+
+	public void setStatus_id(int status_id) {
+		this.status_id = status_id;
+	}
+
+	public String getCreated_by() {
+		return created_by;
+	}
+
+	public void setCreated_by(String created_by) {
+		this.created_by = created_by;
+	}
+
+	public Date getPassword_expiry() {
+		return password_expiry;
+	}
+
+	public void setPassword_expiry(Date password_expiry) {
+		this.password_expiry = password_expiry;
+	}
+
+	public String getCreated_date() {
+		return created_date;
+	}
+
+	public void setCreated_date(String created_date) {
+		this.created_date = created_date;
+	}
+
+	public String getModified_by() {
+		return modified_by;
+	}
+
+	public void setModified_by(String modified_by) {
+		this.modified_by = modified_by;
+	}
+
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public Date getModified_date() {
+		return modified_date;
+	}
+
+	public void setModified_date(Date modified_date) {
+		this.modified_date = modified_date;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + ", username=" + username + ", password=" + password + ", phone="
+				+ phone + ", delivery_address=" + delivery_address + ", email_address=" + email_address
+				+ ", is_email_verified=" + is_email_verified + ", status_id=" + status_id + ", created_by=" + created_by
+				+ ", password_expiry=" + password_expiry + ", created_date=" + created_date + ", modified_by="
+				+ modified_by + ", enabled=" + enabled + ", modified_date=" + modified_date + "]";
 	}
 
 	// To String
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", firstname=" + firstname + ", lastname=" + lastname
-				+ ", email=" + email + ", role=" + role + ", ssn=" + ssn + "]";
-	}
+	
 	
 }

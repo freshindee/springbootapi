@@ -1,5 +1,6 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.dto;
 
+import java.util.List;
 
 public class RecommendedDTO {
     
@@ -17,6 +18,7 @@ public class RecommendedDTO {
     private String promoStartDate;
     private String promoEndDate;
     private String promoDescription;
+    private List<String> images;
 
     public Integer getCategoryId() {
         return categoryId;
@@ -129,5 +131,13 @@ public class RecommendedDTO {
     public void setPromoDescription(String promoDescription) {
         this.promoDescription = promoDescription;
     }
+
+	public List<String> getImages() {
+		return images;
+	}
+
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
     
 }

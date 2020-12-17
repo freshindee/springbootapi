@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
@@ -88,6 +87,7 @@ public class UserController {
 			return new ResponseEntity<User>(user, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
 	        List<String> errors = new ArrayList<String>();
+	        System.out.println(errors.toString());
 			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 		}
 	}

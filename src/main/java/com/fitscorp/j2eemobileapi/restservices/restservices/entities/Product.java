@@ -2,9 +2,6 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import java.text.DecimalFormat;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,24 +12,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
@@ -73,13 +55,15 @@ public class Product implements Serializable {
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    private List<FavProduct> favProductList;
-    @JoinColumn(name = "sub_category_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private SubCategory subCategory;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    private List<OrderProduct> orderProductList;
+    @Column(name = "sub_category_id")
+    private Long subCategoryId;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+//    private List<FavProduct> favProductList;
+//    @JoinColumn(name = "sub_category_id", referencedColumnName = "id")
+//    @ManyToOne(optional = false)
+//    private SubCategory subCategory;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+//    private List<OrderProduct> orderProductList;
 
     public Product() {
     }
@@ -176,31 +160,39 @@ public class Product implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
-    public List<FavProduct> getFavProductList() {
-        return favProductList;
-    }
+//    public List<FavProduct> getFavProductList() {
+//        return favProductList;
+//    }
+//
+//    public void setFavProductList(List<FavProduct> favProductList) {
+//        this.favProductList = favProductList;
+//    }
+//
+//    public SubCategory getSubCategory() {
+//        return subCategory;
+//    }
+//
+//    public void setSubCategory(SubCategory subCategory) {
+//        this.subCategory = subCategory;
+//    }
+//
+//    public List<OrderProduct> getOrderProductList() {
+//        return orderProductList;
+//    }
+//
+//    public void setOrderProductList(List<OrderProduct> orderProductList) {
+//        this.orderProductList = orderProductList;
+//    }
 
-    public void setFavProductList(List<FavProduct> favProductList) {
-        this.favProductList = favProductList;
-    }
+    public Long getSubCategoryId() {
+		return subCategoryId;
+	}
 
-    public SubCategory getSubCategory() {
-        return subCategory;
-    }
+	public void setSubCategoryId(Long subCategoryId) {
+		this.subCategoryId = subCategoryId;
+	}
 
-    public void setSubCategory(SubCategory subCategory) {
-        this.subCategory = subCategory;
-    }
-
-    public List<OrderProduct> getOrderProductList() {
-        return orderProductList;
-    }
-
-    public void setOrderProductList(List<OrderProduct> orderProductList) {
-        this.orderProductList = orderProductList;
-    }
-
-    @Override
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

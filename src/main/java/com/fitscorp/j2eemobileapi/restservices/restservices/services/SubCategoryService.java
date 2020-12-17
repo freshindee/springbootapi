@@ -5,13 +5,16 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.SubCategoryRepository;
 
+@Service
 public class SubCategoryService {
 
 	@Autowired
@@ -68,12 +71,41 @@ public class SubCategoryService {
 		subCategoryRepository.deleteById(id);
 	}
 
-	public Optional<SubCategory> getSubCategoryById(Long id) {
-		return subCategoryRepository.findById(id);
+	public Optional<SubCategory> getSubCategoryById(Long id) throws NotFoundException {
+		Optional<SubCategory> subCategory =  subCategoryRepository.findById(id);
+
+		if (!subCategory.isPresent()) {
+			throw new NotFoundException("Sub category not found");
+		}
+		
+		List<String> images = findAllImages(subCategory.get().getId());
+		subCategory.get().setImages(images);
+		return subCategory;
 	}
 
-	public Optional<SubCategory> getSubCategoryByCategoryId(Long categoryId) {
-		return subCategoryRepository.findById(categoryId);
+	public Optional<SubCategory> getSubCategoryByCategoryId(Long categoryId) throws NotFoundException {
+		Optional<SubCategory> subCategory =  subCategoryRepository.findById(categoryId);
+
+		if (!subCategory.isPresent()) {
+			throw new NotFoundException("Sub category not found");
+		}
+		
+		List<String> images = findAllImages(subCategory.get().getId());
+		subCategory.get().setImages(images);
+		return subCategory;
 	}
 
+	public Optional<List<SubCategory>> getSubCategoriesByCategoryId(Long categoryId) {
+		Optional<List<SubCategory>> subCategories = subCategoryRepository.findAllByCategoryId(categoryId);
+		for (SubCategory cat : subCategories.get()) {
+			List<String> images = findAllImages(cat.getCategoryId());
+			cat.setImages(images);
+		}
+		return subCategories;
+	}
+	
+	public List<String> findAllImages(Long catId) {
+		return subCategoryRepository.findAllImages(catId);
+	}
+	
 }

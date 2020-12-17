@@ -5,6 +5,10 @@
  */
 package com.fitscorp.j2eemobileapi.restservices.restservices.dto;
 
+import java.util.List;
+
+import javax.persistence.ElementCollection;
+
 /**
  *
  * @author User
@@ -14,6 +18,7 @@ public class CategoryDTO {
     private Long categoryId;
     private Integer storeId;
     private String categoryName;
+    private List<String> images;
 
     public Long getCategoryId() {
         return categoryId;
@@ -38,7 +43,13 @@ public class CategoryDTO {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-    
-    
+
+	public List<String> getImages() {
+		return images;
+	}
+
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
     
 }

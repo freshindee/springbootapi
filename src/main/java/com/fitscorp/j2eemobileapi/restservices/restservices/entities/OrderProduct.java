@@ -53,7 +53,7 @@ public class OrderProduct implements Serializable {
     private Date modifiedDate;
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Order1 order1;
+    private Order1 order;
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Product product;
@@ -121,12 +121,12 @@ public class OrderProduct implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
-    public Order1 getOrder1() {
-        return order1;
+    public Order1 getOrder() {
+        return order;
     }
 
-    public void setOrder1(Order1 order1) {
-        this.order1 = order1;
+    public void setOrder(Order1 order) {
+        this.order = order;
     }
 
     public Product getProduct() {

@@ -18,8 +18,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -31,8 +29,8 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "order")
-@NamedQueries({
-    @NamedQuery(name = "Order1.findAll", query = "SELECT o FROM Order1 o")})
+//@NamedQueries({
+//    @NamedQuery(name = "Order1.findAll", query = "SELECT o FROM order o")})
 public class Order1 implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -76,11 +74,10 @@ public class Order1 implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User user;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order1")
+    @OneToMany(targetEntity = OrderProduct.class, cascade = CascadeType.ALL, mappedBy = "order")
     private List<OrderProduct> orderProductList;
 
-    public Order1() {
-    }
+    public Order1() {}
 
     public Order1(Long id) {
         this.id = id;

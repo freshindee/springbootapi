@@ -3,28 +3,25 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import java.io.Serializable;
-import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.List;
 /**
  *
  * @author User
@@ -40,47 +37,52 @@ public class Category implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
-    private Long id;
+    private Long categoryId;
     @Column(name = "name")
-    private String name;
+    private String categoryName;
     @Column(name = "store_id")
     private Integer storeId;
+    @JsonIgnore
     @Column(name = "created_by")
     private String createdBy;
+    @JsonIgnore
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
+    @JsonIgnore
     @Column(name = "enabled")
     private Boolean enabled;
+    @JsonIgnore
     @Column(name = "modified_by")
     private String modifiedBy;
+    @JsonIgnore
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
-    private List<SubCategory> subCategoryList;
+    @ElementCollection(targetClass=String.class)
+    private List<String> images;
 
     public Category() {
     }
 
     public Category(Long id) {
-        this.id = id;
+        this.categoryId = id;
     }
 
-    public Long getId() {
-        return id;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCategoryId(Long id) {
+        this.categoryId = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCategoryName(String name) {
+        this.categoryName = name;
     }
 
     public Integer getStoreId() {
@@ -131,18 +133,18 @@ public class Category implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
-    public List<SubCategory> getSubCategoryList() {
-        return subCategoryList;
-    }
+    public List<String> getImages() {
+		return images;
+	}
 
-    public void setSubCategoryList(List<SubCategory> subCategoryList) {
-        this.subCategoryList = subCategoryList;
-    }
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
 
-    @Override
+	@Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (categoryId != null ? categoryId.hashCode() : 0);
         return hash;
     }
 
@@ -153,7 +155,7 @@ public class Category implements Serializable {
             return false;
         }
         Category other = (Category) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.categoryId == null && other.categoryId != null) || (this.categoryId != null && !this.categoryId.equals(other.categoryId))) {
             return false;
         }
         return true;
@@ -161,7 +163,7 @@ public class Category implements Serializable {
 
     @Override
     public String toString() {
-        return "com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category[ id=" + id + " ]";
+        return "com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category[ id=" + categoryId + " ]";
     }
     
 }

@@ -31,21 +31,28 @@ public class HomeServiceImpl implements HomeService {
         List<CategoryDTO> categories = new ArrayList<>();
         List<SubCategory> subCategories = subCategoryRepository.findAllPromotionSubCategories();
 
+        List<Product> products = subCategoryRepository.findAllPromotionProducts();
+        System.out.println(products.size());
+        
         for (SubCategory subCategory : subCategories) {
-
-            for (Product product : subCategory.getProductList()) {
+        	subCategory.setImages(findAllImages(subCategory.getId()));
+            for (Product product : products) {
 
                 PromotionDTO p = new PromotionDTO();
-                p.setCategoryId(subCategory.getCategory().getId());
+                p.setCategoryId(subCategory.getCategoryId());
                 p.setDescription(product.getDescription());
                 p.setDiscountedPrice(product.getDiscountedPrice().doubleValue());
                 p.setName(product.getName());
                 p.setPrice(product.getPrice().doubleValue());
                 p.setProductId(product.getId());
-                p.setStoreId(subCategory.getCategory().getStoreId());
+                p.setStoreId(subCategory.getStoreId());
                 p.setSubCategoryId(subCategory.getId());
                 p.setSubcategoryName(subCategory.getName());
                 p.setUnit(product.getUnit());
+                p.setPromoStartDate(subCategory.getPromotionStartDate());
+                p.setPromoEndDate(subCategory.getPromotionEndDate());
+                p.setPromoDescription(subCategory.getPromotionDescription());
+            	p.setImages(findAllImages(product.getId()));
                 promotions.add(p);
 
             }
@@ -56,9 +63,10 @@ public class HomeServiceImpl implements HomeService {
         
         for (Category category : categoryList) {
             CategoryDTO c = new CategoryDTO();
-            c.setCategoryId(category.getId());
+            c.setCategoryId(category.getCategoryId());
             c.setStoreId(category.getStoreId());
-            c.setCategoryName(category.getName());
+            c.setCategoryName(category.getCategoryName());
+        	c.setImages(findAllImages(category.getCategoryId()));
             categories.add(c);
         }
         
@@ -70,4 +78,8 @@ public class HomeServiceImpl implements HomeService {
         return homeDTO;
     }
 
+	public List<String> findAllImages(Long catId) {
+		return subCategoryRepository.findAllImages(catId);
+	}
+	
 }

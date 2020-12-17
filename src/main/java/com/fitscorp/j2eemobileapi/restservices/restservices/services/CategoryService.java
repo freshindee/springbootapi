@@ -24,12 +24,20 @@ public class CategoryService {
 	
 
 	public List<Category> getAllCategory() {
-		return categoryRepository.findAll();
+		List<Category> categories = categoryRepository.findAll();
+		for (Category cat : categories) {
+			List<String> images = findAllImages(cat.getCategoryId());
+			cat.setImages(images);
+		}
+		return categories;
 	}
 	
 	public List<SubCategory> getSubAllCategory() {
 		return subCategoryRepository.findAll();
 	}
 
+	public List<String> findAllImages(Long catId) {
+		return categoryRepository.findAllImages(catId);
+	}
 	
 }

@@ -4,23 +4,23 @@ import java.io.Serializable;
 
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.OneToMany;
 
 /**
 *
@@ -40,6 +40,7 @@ public class SubCategory implements Serializable {
    private Long id;
    @Column(name = "name")
    private String name;
+   @JsonIgnore
    @Column(name = "is_promo")
    private Boolean isPromo;
    @Column(name = "promotion_start_date")
@@ -50,23 +51,28 @@ public class SubCategory implements Serializable {
    private Date promotionEndDate;
    @Column(name = "promotion_description")
    private String promotionDescription;
+   @JsonIgnore
    @Column(name = "created_by")
    private String createdBy;
+   @JsonIgnore
    @Column(name = "created_date")
    @Temporal(TemporalType.TIMESTAMP)
    private Date createdDate;
+   @JsonIgnore
    @Column(name = "enabled")
    private Boolean enabled;
+   @JsonIgnore
    @Column(name = "modified_by")
    private String modifiedBy;
+   @JsonIgnore
    @Column(name = "modified_date")
    @Temporal(TemporalType.TIMESTAMP)
    private Date modifiedDate;
-   @OneToMany(cascade = CascadeType.ALL, mappedBy = "subCategory")
-   private List<Product> productList;
-   @JoinColumn(name = "category_id", referencedColumnName = "id")
-   @ManyToOne(optional = false)
-   private Category category;
+   private Long categoryId;
+   @Column(name = "store_id")
+   private Integer storeId;
+   @ElementCollection(targetClass=String.class)
+   private List<String> images;
 
    public SubCategory() {
    }
@@ -163,23 +169,34 @@ public class SubCategory implements Serializable {
        this.modifiedDate = modifiedDate;
    }
 
-   public List<Product> getProductList() {
-       return productList;
+
+   public Long getCategoryId() {
+	   return categoryId;
    }
 
-   public void setProductList(List<Product> productList) {
-       this.productList = productList;
-   }
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
 
-   public Category getCategory() {
-       return category;
-   }
+	
+public Integer getStoreId() {
+		return storeId;
+	}
 
-   public void setCategory(Category category) {
-       this.category = category;
-   }
+	public void setStoreId(Integer storeId) {
+		this.storeId = storeId;
+	}
 
-   @Override
+	
+public List<String> getImages() {
+		return images;
+	}
+
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
+
+@Override
    public int hashCode() {
        int hash = 0;
        hash += (id != null ? id.hashCode() : 0);

@@ -26,16 +26,15 @@ public class UserTokenService {
 
 	}
 
-	public UserToken createUserToken(UserToken userToken) throws UserExistsException{
-		UserToken existingUserToken = userTokenRepository.findByUserId(userToken.getId());
-	
-		//if not exists throw UserExistsException
-		if(existingUserToken != null) {
-			throw new UserExistsException("UserToken already exists in repository");
-		}
+	public UserToken saveUserToken(UserToken userToken) {
+//		UserToken existingUserToken = userTokenRepository.findByUserId(userToken.getUserId());
+//	
+//		//if not exists throw UserExistsException
+//		if(existingUserToken == null) {
+//			throw new UserExistsException("UserToken already exists in repository");
+//		}
 		
-	
-		return userTokenRepository.save(null);
+		return userTokenRepository.save(userToken);
 	}
 
 	public UserToken getUserTokenByUserId(Long id) throws NotFoundException {

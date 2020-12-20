@@ -21,9 +21,9 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long>{
 
 	public Optional<List<SubCategory>> findAllByCategoryId(Long categoryId);
 
-    @Query("SELECT p FROM Product p left join SubCategory s on s.id = p.subCategoryId and s.isPromo='1'")
+    @Query("SELECT p FROM Product p left join SubCategory s on s.id = p.subCategoryId and s.isPromo=1")
 	public List<Product> findAllPromotionProducts();
 
-    @Query(nativeQuery = true, value = "SELECT path FROM file WHERE table_id = :subCatId")
+    @Query(nativeQuery = true, value = "SELECT name FROM file WHERE table_id = :subCatId")
     public List<String> findAllImages(Long subCatId);
 }

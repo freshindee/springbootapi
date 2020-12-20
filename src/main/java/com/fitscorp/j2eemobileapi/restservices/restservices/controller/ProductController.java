@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,21 +25,25 @@ public class ProductController {
 	@Autowired
 	private CategoryService categoryService;
 	
-	
-	
-	@GetMapping("/product")
+	@GetMapping("/{userId}/products")
 	public List<Product> getAllProducts() {
 		return productService.getAllProducts();
 
 	}
-	@PostMapping("/categories")
+	
+	@GetMapping("/{userId}/categories")
 	public List<Category> getAllCategory() {
 		return categoryService.getAllCategory();
 
 	}
-	@PostMapping("/subcategories")
+	
+	@GetMapping("/{userId}/subcategories")
 	public List<SubCategory> getAllSubCategory() {
 		return categoryService.getSubAllCategory();
+	}
 
+	@GetMapping("/{userId}/{subCategoryId}/products")
+	public List<Product> getProductsBySubCategoryId(@PathVariable Long userId, @PathVariable Long subCategoryId) {
+		return productService.getProductsBySubCategoryId(subCategoryId);
 	}
 }

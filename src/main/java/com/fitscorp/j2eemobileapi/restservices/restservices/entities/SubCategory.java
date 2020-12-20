@@ -42,7 +42,7 @@ public class SubCategory implements Serializable {
    private String name;
    @JsonIgnore
    @Column(name = "is_promo")
-   private Boolean isPromo;
+   private Integer isPromo;
    @Column(name = "promotion_start_date")
    @Temporal(TemporalType.TIMESTAMP)
    private Date promotionStartDate;
@@ -97,11 +97,11 @@ public class SubCategory implements Serializable {
        this.name = name;
    }
 
-   public Boolean getIsPromo() {
+   public Integer getIsPromo() {
        return isPromo;
    }
 
-   public void setIsPromo(Boolean isPromo) {
+   public void setIsPromo(Integer isPromo) {
        this.isPromo = isPromo;
    }
 

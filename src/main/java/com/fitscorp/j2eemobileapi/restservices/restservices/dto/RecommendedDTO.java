@@ -1,31 +1,33 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.dto;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class RecommendedDTO {
     
-    private Integer categoryId;
+    private Long categoryId;
     private Integer storeId;
-    private Integer productId;
+    private Long productId;
     private String name;
     private String categoryName;
-    private Integer subCategoryId;
+    private Long subCategoryId;
     private String subcategoryName;
     private String description;
-    private Double price;
-    private Double discountedPrice;
+    private BigDecimal price;
+    private BigDecimal discountedPrice;
     private String unit;
-    private String promoStartDate;
-    private String promoEndDate;
+    private Date promoStartDate;
+    private Date promoEndDate;
     private String promoDescription;
     private List<String> images;
 
-    public Integer getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryId(Long long1) {
+        this.categoryId = long1;
     }
 
     public Integer getStoreId() {
@@ -36,11 +38,11 @@ public class RecommendedDTO {
         this.storeId = storeId;
     }
 
-    public Integer getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(Integer productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 
@@ -60,12 +62,12 @@ public class RecommendedDTO {
         this.categoryName = categoryName;
     }
 
-    public Integer getSubCategoryId() {
+    public Long getSubCategoryId() {
         return subCategoryId;
     }
 
-    public void setSubCategoryId(Integer subCategoryId) {
-        this.subCategoryId = subCategoryId;
+    public void setSubCategoryId(Long id) {
+        this.subCategoryId = id;
     }
 
     public String getSubcategoryName() {
@@ -84,19 +86,19 @@ public class RecommendedDTO {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public Double getDiscountedPrice() {
+    public BigDecimal getDiscountedPrice() {
         return discountedPrice;
     }
 
-    public void setDiscountedPrice(Double discountedPrice) {
+    public void setDiscountedPrice(BigDecimal discountedPrice) {
         this.discountedPrice = discountedPrice;
     }
 
@@ -108,19 +110,19 @@ public class RecommendedDTO {
         this.unit = unit;
     }
 
-    public String getPromoStartDate() {
+    public Date getPromoStartDate() {
         return promoStartDate;
     }
 
-    public void setPromoStartDate(String promoStartDate) {
-        this.promoStartDate = promoStartDate;
+    public void setPromoStartDate(Date date) {
+        this.promoStartDate = date;
     }
 
-    public String getPromoEndDate() {
+    public Date getPromoEndDate() {
         return promoEndDate;
     }
 
-    public void setPromoEndDate(String promoEndDate) {
+    public void setPromoEndDate(Date promoEndDate) {
         this.promoEndDate = promoEndDate;
     }
 

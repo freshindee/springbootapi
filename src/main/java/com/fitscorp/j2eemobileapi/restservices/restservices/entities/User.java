@@ -1,6 +1,6 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,7 +52,7 @@ public class User {
 	private Date password_expiry;
 	
 	@Column(name = "created_date", length = 255, nullable = true)
-	private String created_date;
+	private Date created_date;
 	
 	@Column(name = "modified_by", length = 255, nullable = true)
 	private String modified_by;
@@ -75,8 +75,7 @@ public class User {
 
 	public User(Long userId, String name, String username, String password, String phoneNo, String address,
 			String email, Boolean is_email_verified, String created_by, Date password_expiry,
-			String created_date, String modified_by, int status, Date modified_date) {
-		super();
+			Date created_date, String modified_by, int status, Date modified_date) {
 		this.userId = userId;
 		this.name = name;
 		this.username = username;
@@ -165,6 +164,14 @@ public class User {
 		this.email = email;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public Boolean getIs_email_verified() {
 		return is_email_verified;
 	}
@@ -189,11 +196,11 @@ public class User {
 		this.password_expiry = password_expiry;
 	}
 
-	public String getCreated_date() {
+	public Date getCreated_date() {
 		return created_date;
 	}
 
-	public void setCreated_date(String created_date) {
+	public void setCreated_date(java.util.Date created_date) {
 		this.created_date = created_date;
 	}
 

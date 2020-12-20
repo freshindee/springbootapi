@@ -19,20 +19,14 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserRepos
 @Service
 public class UserService {
 
-	
 	@Autowired
 	private UserRepository userRepository;
-	
-	
-
 	
 	// getAllUsers Method
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
 	}
 
-	
-	
 	// CreateUser Method
 	public User createUser(User user) throws UserExistsException{
 		//if user exist using username
@@ -88,16 +82,15 @@ public class UserService {
 	public void deleteUserById(Long id) {
 		Optional<User> optionalUser = userRepository.findById(id);
 		if (!optionalUser.isPresent()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User Not found in user Repository, provide the correct user id");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not found in user Repository, provide the correct user id");
 		}
 	
 		userRepository.deleteById(id);
 	}
 
 	// getUserByUsername
-
-	public User getUserByEmail(String emai) {
-		return userRepository.findByEmail(emai);
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email);
 	}
 
 }

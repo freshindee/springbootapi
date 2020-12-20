@@ -3,10 +3,12 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.services.impl;
 import com.fitscorp.j2eemobileapi.restservices.restservices.dto.CategoryDTO;
 import com.fitscorp.j2eemobileapi.restservices.restservices.dto.HomeDTO;
 import com.fitscorp.j2eemobileapi.restservices.restservices.dto.PromotionDTO;
+import com.fitscorp.j2eemobileapi.restservices.restservices.dto.RecommendedDTO;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.CategoryRepository;
+import com.fitscorp.j2eemobileapi.restservices.restservices.repository.ProductRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.SubCategoryRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.services.HomeService;
 import java.util.ArrayList;
@@ -18,10 +20,13 @@ import org.springframework.stereotype.Component;
 public class HomeServiceImpl implements HomeService {
 
     @Autowired
-    SubCategoryRepository subCategoryRepository;
+    private SubCategoryRepository subCategoryRepository;
 
     @Autowired
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+	private ProductRepository productRepository;
 
     @Override
     public HomeDTO initHome(Integer userId) throws Exception {
@@ -29,21 +34,22 @@ public class HomeServiceImpl implements HomeService {
         HomeDTO homeDTO = new HomeDTO();
         List<PromotionDTO> promotions = new ArrayList<>();
         List<CategoryDTO> categories = new ArrayList<>();
+        List<RecommendedDTO> recommends = new ArrayList<>();
+        
         List<SubCategory> subCategories = subCategoryRepository.findAllPromotionSubCategories();
-
-        List<Product> products = subCategoryRepository.findAllPromotionProducts();
-        System.out.println(products.size());
         
         for (SubCategory subCategory : subCategories) {
+			List<Product> products = productRepository.findProductsBySubCategoryId(subCategory.getId());
+			
         	subCategory.setImages(findAllImages(subCategory.getId()));
             for (Product product : products) {
 
                 PromotionDTO p = new PromotionDTO();
                 p.setCategoryId(subCategory.getCategoryId());
                 p.setDescription(product.getDescription());
-                p.setDiscountedPrice(product.getDiscountedPrice().doubleValue());
+                p.setDiscountedPrice(product.getDiscountedPrice());
                 p.setName(product.getName());
-                p.setPrice(product.getPrice().doubleValue());
+                p.setPrice(product.getPrice());
                 p.setProductId(product.getId());
                 p.setStoreId(subCategory.getStoreId());
                 p.setSubCategoryId(subCategory.getId());
@@ -70,10 +76,34 @@ public class HomeServiceImpl implements HomeService {
             categories.add(c);
         }
         
-        
+        List<Product> latestProds = productRepository.findTop10ByOrderByIdDesc();
+        for (Product product : latestProds) {
+        	SubCategory subCategory = subCategoryRepository.findById(product.getSubCategoryId()).get();
+        	Category category = categoryRepository.getOne(subCategory.getCategoryId());
+
+            RecommendedDTO p = new RecommendedDTO();
+            p.setCategoryId(subCategory.getCategoryId());
+            p.setCategoryName(category.getCategoryName());
+            p.setDescription(product.getDescription());
+            p.setDiscountedPrice(product.getDiscountedPrice());
+            p.setName(product.getName());
+            p.setPrice(product.getPrice());
+            p.setProductId(product.getId());
+            p.setStoreId(subCategory.getStoreId());
+            p.setSubCategoryId(subCategory.getId());
+            p.setSubcategoryName(subCategory.getName());
+            p.setUnit(product.getUnit());
+            p.setPromoStartDate(subCategory.getPromotionStartDate());
+            p.setPromoEndDate(subCategory.getPromotionEndDate());
+            p.setPromoDescription(subCategory.getPromotionDescription());
+        	p.setImages(findAllImages(product.getId()));
+        	recommends.add(p);
+
+        }
         
         homeDTO.setPromotions(promotions);
         homeDTO.setCategories(categories);
+        homeDTO.setRecommendedList(recommends);
 
         return homeDTO;
     }

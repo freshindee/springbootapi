@@ -18,6 +18,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -28,9 +30,9 @@ import javax.persistence.TemporalType;
  * @author User
  */
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 //@NamedQueries({
-//    @NamedQuery(name = "Order1.findAll", query = "SELECT o FROM order o")})
+//    @NamedQuery(name = "Order1.findAll", query = "SELECT o FROM Order1 o")})
 public class Order1 implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -71,10 +73,9 @@ public class Order1 implements Serializable {
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private User user;
-    @OneToMany(targetEntity = OrderProduct.class, cascade = CascadeType.ALL, mappedBy = "order")
+    @Column(name = "user_id")
+    private Long userId;
+    @OneToMany(targetEntity = OrderProduct.class, cascade = CascadeType.ALL, mappedBy = "orders")
     private List<OrderProduct> orderProductList;
 
     public Order1() {}
@@ -203,15 +204,15 @@ public class Order1 implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
-    public User getUser() {
-        return user;
-    }
+    public Long getUserId() {
+		return userId;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-    public List<OrderProduct> getOrderProductList() {
+	public List<OrderProduct> getOrderProductList() {
         return orderProductList;
     }
 

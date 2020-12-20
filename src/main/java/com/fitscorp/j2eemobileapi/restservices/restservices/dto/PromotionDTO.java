@@ -1,5 +1,6 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -17,12 +18,38 @@ public class PromotionDTO {
     private String promoDescription;
     private String name;
     private String description;
-    private Double price;
-    private Double discountedPrice;
-    private Integer unit;
+    private BigDecimal price;
+    private BigDecimal discountedPrice;
+    private String unit;
     private List<String> images;
+    
+    
+    public PromotionDTO() {
+	}
+    
+	public PromotionDTO(Long categoryId, Integer storeId, Long productId, Long subCategoryId, String subCategoryName,
+			Date promoStartDate, Date promoEndDate, String promoDescription, String name, String description,
+			BigDecimal price, BigDecimal discountedPrice, String unit, List<String> images) {
+		super();
+		this.categoryId = categoryId;
+		this.storeId = storeId;
+		this.productId = productId;
+		this.subCategoryId = subCategoryId;
+		this.subCategoryName = subCategoryName;
+		this.promoStartDate = promoStartDate;
+		this.promoEndDate = promoEndDate;
+		this.promoDescription = promoDescription;
+		this.name = name;
+		this.description = description;
+		this.price = price;
+		this.discountedPrice = discountedPrice;
+		this.unit = unit;
+		this.images = images;
+	}
 
-    public Long getCategoryId() {
+
+
+	public Long getCategoryId() {
         return categoryId;
     }
 
@@ -78,27 +105,27 @@ public class PromotionDTO {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public Double getDiscountedPrice() {
+    public BigDecimal getDiscountedPrice() {
         return discountedPrice;
     }
 
-    public void setDiscountedPrice(Double discountedPrice) {
+    public void setDiscountedPrice(BigDecimal discountedPrice) {
         this.discountedPrice = discountedPrice;
     }
 
-    public Integer getUnit() {
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Integer unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 

@@ -3,7 +3,10 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -42,7 +45,7 @@ public class Product implements Serializable {
     @Column(name = "discounted_price")
     private BigDecimal discountedPrice;
     @Column(name = "unit")
-    private Integer unit;
+    private String unit;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_date")
@@ -57,6 +60,8 @@ public class Product implements Serializable {
     private Date modifiedDate;
     @Column(name = "sub_category_id")
     private Long subCategoryId;
+    @ElementCollection(targetClass=String.class)
+    List<String> images;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
 //    private List<FavProduct> favProductList;
 //    @JoinColumn(name = "sub_category_id", referencedColumnName = "id")
@@ -112,11 +117,11 @@ public class Product implements Serializable {
         this.discountedPrice = discountedPrice;
     }
 
-    public Integer getUnit() {
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Integer unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 
@@ -184,7 +189,15 @@ public class Product implements Serializable {
 //        this.orderProductList = orderProductList;
 //    }
 
-    public Long getSubCategoryId() {
+    public List<String> getImages() {
+		return images;
+	}
+
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
+
+	public Long getSubCategoryId() {
 		return subCategoryId;
 	}
 

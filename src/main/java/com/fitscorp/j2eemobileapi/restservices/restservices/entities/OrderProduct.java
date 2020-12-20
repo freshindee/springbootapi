@@ -37,6 +37,8 @@ public class OrderProduct implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Column(name = "order_id", insertable=false, updatable=false)
+    private Long orderId;
     @Column(name = "quantity")
     private Integer quantity;
     @Column(name = "created_by")
@@ -47,13 +49,13 @@ public class OrderProduct implements Serializable {
     @Column(name = "enabled")
     private Boolean enabled;
     @Column(name = "modified_by")
-    private String modifiedBy;
+    private String modifiedBy;	
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Order1 order;
+    private Order1 orders;
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Product product;
@@ -122,11 +124,11 @@ public class OrderProduct implements Serializable {
     }
 
     public Order1 getOrder() {
-        return order;
+        return orders;
     }
 
     public void setOrder(Order1 order) {
-        this.order = order;
+        this.orders = order;
     }
 
     public Product getProduct() {
@@ -137,7 +139,15 @@ public class OrderProduct implements Serializable {
         this.product = product;
     }
 
-    @Override
+    public Long getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(Long orderId) {
+		this.orderId = orderId;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

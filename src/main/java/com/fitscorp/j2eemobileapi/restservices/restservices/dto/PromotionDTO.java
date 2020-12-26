@@ -9,7 +9,7 @@ import javax.persistence.ElementCollection;
 public class PromotionDTO {
     
     private Long categoryId;
-    private Integer storeId;
+    private Long storeId;
     private Long productId;
     private Long subCategoryId;
     private String subCategoryName;
@@ -27,7 +27,7 @@ public class PromotionDTO {
     public PromotionDTO() {
 	}
     
-	public PromotionDTO(Long categoryId, Integer storeId, Long productId, Long subCategoryId, String subCategoryName,
+	public PromotionDTO(Long categoryId, Long storeId, Long productId, Long subCategoryId, String subCategoryName,
 			Date promoStartDate, Date promoEndDate, String promoDescription, String name, String description,
 			BigDecimal price, BigDecimal discountedPrice, String unit, List<String> images) {
 		super();
@@ -57,11 +57,11 @@ public class PromotionDTO {
         this.categoryId = string;
     }
 
-    public Integer getStoreId() {
+    public Long getStoreId() {
         return storeId;
     }
 
-    public void setStoreId(Integer storeId) {
+    public void setStoreId(Long storeId) {
         this.storeId = storeId;
     }
 

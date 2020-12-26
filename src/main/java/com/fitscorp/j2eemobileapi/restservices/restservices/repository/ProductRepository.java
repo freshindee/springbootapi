@@ -19,4 +19,7 @@ public interface ProductRepository  extends JpaRepository<Product, Long>{
 	
 	@Query(value="SELECT * FROM product ORDER BY created_date DESC LIMIT 10", nativeQuery=true)
 	public List<Product> findTop10ByOrderByIdDesc();
+
+	@Query(value="SELECT * FROM product WHERE sub_category_id = 0", nativeQuery=true)
+	public List<Product> findAllPromotions();
 }

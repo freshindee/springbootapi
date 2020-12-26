@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -33,20 +32,14 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-			.authorizeRequests()
-			.antMatchers("/users/*")
-			.permitAll()
-			.and()
-			.authorizeRequests()
-			.antMatchers("/-1/**")
-			.permitAll()
-			.and()
-			.authorizeRequests()
-			.antMatchers("/images/**")
-			.permitAll()
-			.anyRequest()
-			.authenticated()
+//		http.csrf().ignoringAntMatchers("/users/*").and()
+		http.csrf().disable().authorizeRequests().antMatchers("/users/*").permitAll()
+			.antMatchers("/-1/**").permitAll()
+			.antMatchers("/images/**").permitAll()
+			.antMatchers("/{0-9}/products/**").permitAll()
+			.antMatchers("/{0-9}/sub/**").permitAll()
+			.antMatchers("/promotions/**").permitAll()
+			.anyRequest().authenticated()
 			.and()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

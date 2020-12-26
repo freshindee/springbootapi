@@ -7,7 +7,7 @@ import java.util.List;
 public class RecommendedDTO {
     
     private Long categoryId;
-    private Integer storeId;
+    private Long storeId;
     private Long productId;
     private String name;
     private String categoryName;
@@ -30,11 +30,11 @@ public class RecommendedDTO {
         this.categoryId = long1;
     }
 
-    public Integer getStoreId() {
+    public Long getStoreId() {
         return storeId;
     }
 
-    public void setStoreId(Integer storeId) {
+    public void setStoreId(Long storeId) {
         this.storeId = storeId;
     }
 

@@ -1,9 +1,12 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class AuthenticationResponse {
 
 	private Long userId;
 	private String name;
+	@JsonIgnore
 	private String password;
 	private String phoneNo;
 	private String deliveryAddress;

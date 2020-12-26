@@ -13,8 +13,8 @@ public class Settings {
 		this.deliveryFee = deliveryFee;
 	}
 
-	public BigDecimal getDeliveryFee() {
-		return deliveryFee;
+	public Double getDeliveryFee() {
+		return deliveryFee.doubleValue();
 	}
 
 	public void setDeliveryFee(BigDecimal deliveryFee) {

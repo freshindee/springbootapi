@@ -70,7 +70,7 @@ public class SubCategory implements Serializable {
    private Date modifiedDate;
    private Long categoryId;
    @Column(name = "store_id")
-   private Integer storeId;
+   private Long storeId;
    @ElementCollection(targetClass=String.class)
    private List<String> images;
 
@@ -179,11 +179,11 @@ public class SubCategory implements Serializable {
 	}
 
 	
-public Integer getStoreId() {
+public Long getStoreId() {
 		return storeId;
 	}
 
-	public void setStoreId(Integer storeId) {
+	public void setStoreId(Long storeId) {
 		this.storeId = storeId;
 	}
 

@@ -14,7 +14,8 @@ import org.springframework.data.jpa.repository.Query;
 @Repository
 public interface SubCategoryRepository extends JpaRepository<SubCategory, Long>{
 
-	SubCategory findByCategoryId(Long categoryId);
+    @Query("SELECT s FROM SubCategory s WHERE s.categoryId = :categoryId")
+	List<SubCategory> findByCategoryId(Long categoryId);
 	
     @Query("SELECT s FROM SubCategory s WHERE s.isPromo='1'")
     public List<SubCategory> findAllPromotionSubCategories() throws Exception;

@@ -1,7 +1,6 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.services;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,13 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fitscorp.j2eemobileapi.restservices.restservices.dto.PromotionDTO;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
+import com.fitscorp.j2eemobileapi.restservices.restservices.dto.SubCategoryDTO;
+import com.fitscorp.j2eemobileapi.restservices.restservices.dto.SubCategoryWrapperDTO;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.repository.ProductRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.SubCategoryRepository;
 
 @Service
@@ -24,53 +21,11 @@ public class SubCategoryService {
 
 	@Autowired
 	private SubCategoryRepository subCategoryRepository;
-	
-	@Autowired
-	private ProductRepository productRepository;
 
 	public List<SubCategory> getAllSubCategories() {
 
 		return subCategoryRepository.findAll();
 
-	}
-
-	public List<PromotionDTO> getAllPromotions() throws Exception {
-		List<SubCategory> subCategories =  subCategoryRepository.findAllPromotionSubCategories();
-		List<PromotionDTO> promos = new ArrayList<>();
-		if (subCategories == null) {
-			throw new NotFoundException("Sub category not found");
-		}
-		
-		for (SubCategory subCat : subCategories) {
-			List<Product> products = productRepository.findProductsBySubCategoryId(subCat.getId());
-			
-			for (Product product : products) {
-				List<String> images = findAllImages(product.getId());
-				product.setImages(images);
-				
-				PromotionDTO promo = new PromotionDTO(
-					subCat.getCategoryId(), 
-					subCat.getStoreId(), 
-					product.getId(), 
-					product.getSubCategoryId(), 
-					subCat.getName(),
-					subCat.getPromotionStartDate(), 
-					subCat.getPromotionEndDate(), 
-					subCat.getPromotionDescription(), 
-					product.getName(), 
-					product.getDescription(),
-					product.getPrice(), 
-					product.getDiscountedPrice(), 
-					product.getUnit(), 
-					product.getImages()
-				);
-				promos.add(promo);
-			}
-			
-			List<String> images = findAllImages(subCat.getId());
-			subCat.setImages(images);
-		}
-		return promos;
 	}
 
 	public SubCategory createSubCategory(SubCategory subCategory) throws UserExistsException{
@@ -86,15 +41,15 @@ public class SubCategoryService {
 		return subCategoryRepository.save(subCategory);
 	}
 
-	public Optional<SubCategory> getSubCategoryId(Long id) throws NotFoundException {
-		Optional<SubCategory> subCategory = subCategoryRepository.findById(id);
-
-		if (!subCategory.isPresent()) {
-			throw new NotFoundException("Sub category Not found");
-		}
-
-		return subCategory;
-	}
+//	public Optional<SubCategory> getSubCategoryId(Long id) throws NotFoundException {
+//		Optional<SubCategory> subCategory = subCategoryRepository.findById(id);
+//
+//		if (!subCategory.isPresent()) {
+//			throw new NotFoundException("Sub category Not found");
+//		}
+//
+//		return subCategory;
+//	}
 
 	public SubCategory updateSubCategoryById(Long id, SubCategory subCategory) throws NotFoundException {
 		Optional<SubCategory> optionalSubCategory = subCategoryRepository.findById(id);
@@ -118,37 +73,79 @@ public class SubCategoryService {
 		subCategoryRepository.deleteById(id);
 	}
 
-	public Optional<SubCategory> getSubCategoryById(Long id) throws NotFoundException {
+	public SubCategoryDTO getSubCategoryById(Long id) throws NotFoundException {
 		Optional<SubCategory> subCategory =  subCategoryRepository.findById(id);
 
 		if (!subCategory.isPresent()) {
 			throw new NotFoundException("Sub category not found");
 		}
-		
+
 		List<String> images = findAllImages(subCategory.get().getId());
 		subCategory.get().setImages(images);
-		return subCategory;
+		
+		SubCategoryDTO subCatDto = new SubCategoryDTO(
+				subCategory.get().getId(), 
+				subCategory.get().getCategoryId(), 
+				subCategory.get().getStoreId(), 
+				subCategory.get().getName(), 
+				subCategory.get().getPromotionStartDate(),
+				subCategory.get().getPromotionEndDate(), 
+				subCategory.get().getPromotionDescription(), 
+				subCategory.get().getImages());
+		
+		return subCatDto;
 	}
 
-	public Optional<SubCategory> getSubCategoryByCategoryId(Long categoryId) throws NotFoundException {
-		Optional<SubCategory> subCategory =  subCategoryRepository.findById(categoryId);
+	public SubCategoryWrapperDTO<SubCategoryDTO> getSubCategoriesByCategoryId(Long categoryId) throws NotFoundException {
+		List<SubCategory> subCategories =  subCategoryRepository.findByCategoryId(categoryId);
 
-		if (!subCategory.isPresent()) {
+		if (subCategories == null) {
+			throw new NotFoundException("Sub categories not found");
+		}
+		
+		List<SubCategoryDTO> subCategoryDtos = new ArrayList<>();
+
+		for (SubCategory subCategory : subCategories) {
+			List<String> images = findAllImages(subCategory.getId());
+			subCategory.setImages(images);
+			
+			SubCategoryDTO subCatDto = new SubCategoryDTO(
+					subCategory.getId(), 
+					subCategory.getCategoryId(), 
+					subCategory.getStoreId(), 
+					subCategory.getName(), 
+					subCategory.getPromotionStartDate(),
+					subCategory.getPromotionEndDate(), 
+					subCategory.getPromotionDescription(), 
+					subCategory.getImages());
+			
+			subCategoryDtos.add(subCatDto);
+		}
+		
+		return new SubCategoryWrapperDTO<SubCategoryDTO>(subCategoryDtos);
+	}
+
+//	public Optional<List<SubCategory>> getSubCategoriesByCategoryId(Long categoryId) {
+//		Optional<List<SubCategory>> subCategories = subCategoryRepository.findAllByCategoryId(categoryId);
+//		for (SubCategory cat : subCategories.get()) {
+//			List<String> images = findAllImages(cat.getCategoryId());
+//			cat.setImages(images);
+//		}
+//		return subCategories;
+//	}
+	
+	public SubCategoryWrapperDTO<SubCategory> findAllPromotionSubCategories() throws Exception {
+		List<SubCategory> subCategories = subCategoryRepository.findAllPromotionSubCategories();
+		if (subCategories == null) {
 			throw new NotFoundException("Sub category not found");
 		}
-		
-		List<String> images = findAllImages(subCategory.get().getId());
-		subCategory.get().setImages(images);
-		return subCategory;
-	}
 
-	public Optional<List<SubCategory>> getSubCategoriesByCategoryId(Long categoryId) {
-		Optional<List<SubCategory>> subCategories = subCategoryRepository.findAllByCategoryId(categoryId);
-		for (SubCategory cat : subCategories.get()) {
-			List<String> images = findAllImages(cat.getCategoryId());
-			cat.setImages(images);
+		for (SubCategory sub : subCategories) {
+			sub.setImages(findAllImages(sub.getId()));
 		}
-		return subCategories;
+		
+		return new SubCategoryWrapperDTO<SubCategory>(subCategories);
+		
 	}
 	
 	public List<String> findAllImages(Long catId) {

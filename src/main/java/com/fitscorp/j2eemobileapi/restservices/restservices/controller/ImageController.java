@@ -47,7 +47,7 @@ public class ImageController {
 	                .contentLength(inputStream.contentLength())
 	                .body(inputStream);
 		} catch (IOException e) {
-			throw new NotFoundException("Image not found");
+			return null;
 		}
 	}
 }

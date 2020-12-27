@@ -47,6 +47,7 @@ public class OrderService {
 		order.setDeliveryFee(request.getDeliveryFee());
 		order.setSubTotal(request.getSubTotal());
 		order.setTotal(request.getTotal());
+		order.setUserId(request.getUserId());
 		
 		Date now = new Date();
 		

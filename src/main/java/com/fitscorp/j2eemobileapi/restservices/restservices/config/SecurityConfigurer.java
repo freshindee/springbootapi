@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fitscorp.j2eemobileapi.restservices.restservices.filters.JwtRequestFilter;
@@ -39,7 +40,10 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 			.antMatchers("/{0-9}/products/**").permitAll()
 			.antMatchers("/{0-9}/sub/**").permitAll()
 			.antMatchers("/promotions/**").permitAll()
+			.antMatchers("/usersregistrations/").permitAll()
 			.anyRequest().authenticated()
+            .and()
+            .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint())
 			.and()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -52,6 +56,11 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint(){
+        return new CustomAuthenticationEntryPoint();
+    }
+	
 	@Bean
 	PasswordEncoder passwordEncoder() {
 	    return new BCryptPasswordEncoder();

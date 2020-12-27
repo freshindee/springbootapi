@@ -3,6 +3,7 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.BadAttributeValueExpException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -11,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -20,6 +22,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -32,9 +35,23 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExist
 @RestControllerAdvice
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
+	// 403
+    // Authorization failed
+    @ExceptionHandler({ AuthenticationException.class })
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
+        logger.info(ex.getClass().getName());
+        logger.error("error", ex);
+
+        System.out.println(ex.getLocalizedMessage());
+        final ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), null, "Authorization failed to requested resource!");
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+    }
+
     // 400
 
-    @Override
+    @ExceptionHandler({ org.springframework.web.server.ResponseStatusException.class })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
         logger.info(ex.getClass().getName());
         //
@@ -50,6 +67,8 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, headers, HttpStatus.valueOf(apiError.getStatus()), request);
     }
 
+    @ExceptionHandler({ UserExistsException.class })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<Object> handleAlreadyExists(final UserExistsException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
         logger.info(ex.getClass().getName());
         logger.error("error", ex);
@@ -60,17 +79,16 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
     }
     
     // 401
-
     @ExceptionHandler({ BadCredentialsException.class })
     public ResponseEntity<Object> handleBadCredentials(final Exception ex, final WebRequest request) {
         logger.info(ex.getClass().getName());
         logger.error("error", ex);
 
         System.out.println(ex.getLocalizedMessage());
-        final ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), null, "Wrong credentials, authentication failed!");
+        final ApiError apiError = new ApiError(HttpStatus.FORBIDDEN.value(), null, "Wrong credentials, authentication failed!");
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
-
+    
     // 403
 
     @ExceptionHandler({ UsernameNotFoundException.class })

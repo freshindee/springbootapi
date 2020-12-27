@@ -2,6 +2,8 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +37,8 @@ public class OrderController {
 	}
 	
 	@PostMapping("/orders/{userId}")
-	public OrderResponse placeAnOrder(@PathVariable Integer userId, @RequestBody OrderRequest request) throws Exception {
+	public OrderResponse placeAnOrder(@PathVariable Integer userId, @Valid @RequestBody OrderRequest request) throws Exception {
+		request.setUserId(userId.longValue());
 		Long result = orderService.saveOrder(userId, request);
 		if (result != null) {
 			return new OrderResponse(result);
@@ -49,6 +52,6 @@ public class OrderController {
 		if (result != null) {
 			return ResponseEntity.ok(result);
 		}
-		throw new Exception("Order confirmation failed");
+		throw new NotFoundException("Order confirmation failed");
 	}
 }

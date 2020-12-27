@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.FavProduct;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
 
 
@@ -22,4 +23,7 @@ public interface ProductRepository  extends JpaRepository<Product, Long>{
 
 	@Query(value="SELECT * FROM product WHERE sub_category_id = 0", nativeQuery=true)
 	public List<Product> findAllPromotions();
+
+    @Query(nativeQuery = true, value = "SELECT * FROM fav_product WHERE user_id = :userId")
+    public List<FavProduct> findFavoriteProductsByUserId(Long userId);
 }

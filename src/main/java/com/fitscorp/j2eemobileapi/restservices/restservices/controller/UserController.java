@@ -2,6 +2,7 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,14 +35,18 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fitscorp.j2eemobileapi.restservices.restservices.config.JwtUtil;
+import com.fitscorp.j2eemobileapi.restservices.restservices.dto.ProductWrapperDTO;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.UserToken;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.ApiError;
+import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.RestResponse;
 import com.fitscorp.j2eemobileapi.restservices.restservices.request.AuthenticationRequest;
 import com.fitscorp.j2eemobileapi.restservices.restservices.request.RegisterRequest;
 import com.fitscorp.j2eemobileapi.restservices.restservices.response.AuthenticationResponse;
 import com.fitscorp.j2eemobileapi.restservices.restservices.response.Settings;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.services.ProductService;
 import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserService;
 import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserTokenService;
 
@@ -64,12 +69,17 @@ public class UserController {
 	@Autowired
 	private UserTokenService userTokenService;
 
+	@Autowired
+	private ProductService productService;
+
 	@RequestMapping(value = "/auth", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticateToken(@Valid @RequestBody AuthenticationRequest request) throws BadCredentialsException {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 		} catch (Exception e) {
-			throw new BadCredentialsException("Incorrect username or password", e);
+			final ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), null, "Authorization failed to requested resource!");
+//			throw new BadCredentialsException("Incorrect username or password", e);
+			return new ResponseEntity<ApiError>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
 		}
 		
 		UserDetails userDetails = userDetailService.loadUserByUsername(request.getUsername());
@@ -103,9 +113,9 @@ public class UserController {
 				AuthenticationResponse authRes = saveUserDetailsAndGenerateAuthResponse(userDetails, createdUser);
 				return new ResponseEntity<AuthenticationResponse>(authRes, headers, HttpStatus.OK);
 			}
-			throw new UsernameNotFoundException("Retriving user failed", null);
+			return new ResponseEntity<Object>(new RestResponse<String>(400, Arrays.asList("Retriving user failed"), null), new HttpHeaders(), HttpStatus.BAD_REQUEST);
 		} catch(UserExistsException ex) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+			return new ResponseEntity<Object>(new RestResponse<String>(400, Arrays.asList("Email address already exists"), null), new HttpHeaders(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -186,5 +196,14 @@ public class UserController {
 		userTokenService.saveUserToken(token);
 		return authRes;
 	}
-	
+
+	@GetMapping("/{userId}/fav-list")
+	public ProductWrapperDTO getFavoriteProducts(@PathVariable Long userId) {
+		try {
+			return productService.getFavoriteProducts(userId);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+			return new ProductWrapperDTO(new ArrayList<>());
+		}
+	}
 }

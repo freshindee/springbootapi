@@ -6,6 +6,7 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -13,8 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -25,8 +24,8 @@ import javax.persistence.TemporalType;
  *
  * @author User
  */
-@Entity
 @Table(name = "fav_product")
+@Entity
 @NamedQueries({
     @NamedQuery(name = "FavProduct.findAll", query = "SELECT f FROM FavProduct f")})
 public class FavProduct implements Serializable {
@@ -36,7 +35,7 @@ public class FavProduct implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
-    private Long id;
+    private BigInteger id;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_date")
@@ -49,25 +48,37 @@ public class FavProduct implements Serializable {
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Product product;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private User user;
+    @Column(name = "product_id")
+    private BigInteger productId;
+    @Column(name = "user_id")
+    private BigInteger userId;
 
     public FavProduct() {
     }
+    
+    public FavProduct(BigInteger id, BigInteger productId, BigInteger userId, String createdBy, Date createdDate, Boolean enabled, String modifiedBy,
+			Date modifiedDate) {
+		this.id = id;
+		this.createdBy = createdBy;
+		this.createdDate = createdDate;
+		this.enabled = enabled;
+		this.modifiedBy = modifiedBy;
+		this.modifiedDate = modifiedDate;
+		this.productId = productId;
+		this.userId = userId;
+	}
 
-    public FavProduct(Long id) {
+
+
+	public FavProduct(BigInteger id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
@@ -110,24 +121,24 @@ public class FavProduct implements Serializable {
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
+    
+    public BigInteger getProductId() {
+		return productId;
+	}
 
-    public Product getProduct() {
-        return product;
-    }
+	public void setProductId(BigInteger productId) {
+		this.productId = productId;
+	}
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+	public BigInteger getUserId() {
+		return userId;
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public void setUserId(BigInteger userId) {
+		this.userId = userId;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    @Override
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

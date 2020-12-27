@@ -1,6 +1,9 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.handlers;
 
+import java.io.InputStream;
+
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -20,7 +23,7 @@ public class TLResponseAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
         ServerHttpResponse response) {
-    	if (body instanceof ApiError) {
+    	if (body instanceof ApiError || body instanceof Resource) {
             return body;
         }
         final RestResponse<Object> output = new RestResponse<>();

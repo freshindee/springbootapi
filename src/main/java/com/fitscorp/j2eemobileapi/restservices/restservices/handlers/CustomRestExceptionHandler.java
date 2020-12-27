@@ -10,6 +10,8 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -24,6 +26,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 
 @RestControllerAdvice
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -46,6 +50,39 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, headers, HttpStatus.valueOf(apiError.getStatus()), request);
     }
 
+    protected ResponseEntity<Object> handleAlreadyExists(final UserExistsException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+        logger.info(ex.getClass().getName());
+        logger.error("error", ex);
+
+        System.out.println(ex.getLocalizedMessage());
+        final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, "Email address already exists!");
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+    }
+    
+    // 401
+
+    @ExceptionHandler({ BadCredentialsException.class })
+    public ResponseEntity<Object> handleBadCredentials(final Exception ex, final WebRequest request) {
+        logger.info(ex.getClass().getName());
+        logger.error("error", ex);
+
+        System.out.println(ex.getLocalizedMessage());
+        final ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), null, "Wrong credentials, authentication failed!");
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+    }
+
+    // 403
+
+    @ExceptionHandler({ UsernameNotFoundException.class })
+    public ResponseEntity<Object> handleUserNotFound(final Exception ex, final WebRequest request) {
+        logger.info(ex.getClass().getName());
+        logger.error("error", ex);
+
+        System.out.println(ex.getLocalizedMessage());
+        final ApiError apiError = new ApiError(HttpStatus.FORBIDDEN.value(), null, "Access Denied");
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+    }
+    
     @Override
     protected ResponseEntity<Object> handleBindException(final BindException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
         logger.info(ex.getClass().getName());
@@ -173,7 +210,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("error", ex);
 
         System.out.println(ex.getLocalizedMessage());
-        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "error occurred");
+        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Internal server error");
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 

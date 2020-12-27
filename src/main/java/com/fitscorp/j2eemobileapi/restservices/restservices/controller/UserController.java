@@ -1,98 +1,147 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.controller;
 
-
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fitscorp.j2eemobileapi.restservices.restservices.config.JwtUtil;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.UserToken;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserNotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.request.AuthenticationRequest;
+import com.fitscorp.j2eemobileapi.restservices.restservices.request.RegisterRequest;
+import com.fitscorp.j2eemobileapi.restservices.restservices.response.AuthenticationResponse;
+import com.fitscorp.j2eemobileapi.restservices.restservices.response.Settings;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserService;
+import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserTokenService;
 
-
-
-//Controller -
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
-	// Autowire the UserService
 	@Autowired
-	private UserService userService;
+	AuthenticationManager authenticationManager;
+	
+	@Autowired
+	UserDetailsService userDetailService;
+	
+	@Autowired
+	UserService userService;
+	
+	@Autowired
+	JwtUtil jwtUtil;
 
-	// getAllUsers Method
-	@GetMapping("/users")
-	public List<User> getAllUsers() {
+	@Autowired
+	private UserTokenService userTokenService;
 
-		return userService.getAllUsers();
-
+	@RequestMapping(value = "/auth", method = RequestMethod.POST)
+	public ResponseEntity<?> createAuthenticateToken(@Valid @RequestBody AuthenticationRequest request) throws BadCredentialsException {
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+		} catch (Exception e) {
+			throw new BadCredentialsException("Incorrect username or password", e);
+		}
+		
+		UserDetails userDetails = userDetailService.loadUserByUsername(request.getUsername());
+		User loggedUser = userService.getUserByEmail(request.getUsername());
+		AuthenticationResponse authRes = saveUserDetailsAndGenerateAuthResponse(userDetails, loggedUser);
+		
+		return ResponseEntity.ok(authRes);
 	}
 
-	// Create User Method
-	// @RequestBody Annotation
-	// @PostMapping Annotation
-	@PostMapping("/users")
-	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder builder) {
+	// Register User Method
+	@PostMapping("/registrations")
+	public ResponseEntity<?> createUser(@Valid @RequestBody RegisterRequest request, UriComponentsBuilder builder) throws UserExistsException {
 		try {
-			userService.createUser(user);
-			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(builder.path("/users/{id}").buildAndExpand(user.getUserId()).toUri());
-			return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+			if (userService.getUserByEmail(request.getEmail()) != null)
+				throw new UserExistsException("Email address already exists");
+			User user = new User();
+			user.setCreated_date(new Date());
+			user.setEmail(request.getEmail());
+			user.setUsername(request.getEmail());
+			user.setIs_email_verified(false);
+			user.setName(request.getName());
+			user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
+			user.setPhoneNo(request.getPhoneNo());
+			user.setStatus(0);
 			
+			User createdUser = userService.createUser(user);
+			if (createdUser != null) {
+				HttpHeaders headers = new HttpHeaders();
+				headers.setLocation(builder.path("/users/{id}").buildAndExpand(createdUser.getUserId()).toUri());
+				UserDetails userDetails = userDetailService.loadUserByUsername(createdUser.getEmail());
+				AuthenticationResponse authRes = saveUserDetailsAndGenerateAuthResponse(userDetails, createdUser);
+				return new ResponseEntity<AuthenticationResponse>(authRes, headers, HttpStatus.OK);
+			}
+			throw new UsernameNotFoundException("Retriving user failed", null);
 		} catch(UserExistsException ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
 		}
 	}
 
-	// getUserById
-	@GetMapping("/users/{id}")
+	@GetMapping("/{id}")
 	public Optional<User> getUserByUserId(@PathVariable("id") Long id) {
 
 		try {
 			return userService.getUserByUserId(id);
-		} catch (UserNotFoundException ex) {
+		} catch (NotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
 		}
 
 	}
 
-	// updateUserById
-	@PutMapping("/users/{id}")
+	@GetMapping("")
+	public List<User> getAllUsers() {
+		return userService.getAllUsers();
+	}
+	
+	@PutMapping("/{id}")
 	public User updateUserById(@PathVariable("id") Long id, @RequestBody User user) {
 
 		try {
 			return userService.updateUserById(id, user);
-		} catch (UserNotFoundException ex) {
+		} catch (NotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
 		}
 
 	}
 
-	// deleteUserById
-	@DeleteMapping("/users/{id}")
+	@DeleteMapping("/{id}")
 	public void deleteUserByUserId(@PathVariable("id") Long id) {
 		userService.deleteUserById(id);
 	}
 
-	// getUserByEmail
-	@GetMapping(path = "/users", params = "email")
+	@GetMapping(path = "", params = "email")
 	public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
 		try {
 			User user = userService.getUserByEmail(email);
@@ -101,7 +150,41 @@ public class UserController {
 			return new ResponseEntity<User>(user, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
 	        List<String> errors = new ArrayList<String>();
+	        System.out.println(errors.toString());
 			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 		}
 	}
+
+	private AuthenticationResponse saveUserDetailsAndGenerateAuthResponse(UserDetails userDetails, User user) {
+		// By initial design @username and @email hold the exact same value
+		String refreshToken = jwtUtil.generateToken(userDetails);
+		String accessToken = jwtUtil.generateToken(userDetails);
+		
+		UserToken token = new UserToken();
+		token.setAccessToken(accessToken);
+		token.setCreatedBy(user.getEmail());
+		token.setCreatedDate(new Date());
+		token.setEnabled(true);
+		token.setStatus(1);
+		token.setUserId(user.getUserId());
+		user.setTokens(token);
+		
+		AuthenticationResponse authRes = new AuthenticationResponse(
+			user.getUserId(), 
+			user.getName(), 
+			user.getPassword(), 
+			user.getPhoneNo(), 
+			user.getAddress(),
+			user.getEmail(), 
+			user.getPasswordStatus(), 
+			user.getStatus(), 
+			new Settings(new BigDecimal(30.0)),
+			accessToken,
+			refreshToken
+		);
+		
+		userTokenService.saveUserToken(token);
+		return authRes;
+	}
+	
 }

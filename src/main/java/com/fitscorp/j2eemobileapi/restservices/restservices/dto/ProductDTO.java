@@ -16,6 +16,7 @@ public class ProductDTO {
     private BigDecimal price;
     private BigDecimal discountedPrice;
     private String unit;
+    private Boolean isFavorite;
     private List<String> images;
     
     
@@ -24,7 +25,7 @@ public class ProductDTO {
 
 	public ProductDTO(Long categoryId, Long storeId, Long productId, Long subCategoryId, String categoryName,
 			String subCategoryName, String name, String description, BigDecimal price, BigDecimal discountedPrice,
-			String unit, List<String> images) {
+			String unit, Boolean isFavorite, List<String> images) {
 		super();
 		this.categoryId = categoryId;
 		this.storeId = storeId;
@@ -37,10 +38,9 @@ public class ProductDTO {
 		this.price = price;
 		this.discountedPrice = discountedPrice;
 		this.unit = unit;
+		this.isFavorite = isFavorite;
 		this.images = images;
 	}
-
-
 
 	public Long getCategoryId() {
         return categoryId;
@@ -134,7 +134,15 @@ public class ProductDTO {
 		this.subCategoryName = subCategoryName;
 	}
 
-	public List<String> getImages() {
+    public Boolean getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public List<String> getImages() {
 		return images;
 	}
 

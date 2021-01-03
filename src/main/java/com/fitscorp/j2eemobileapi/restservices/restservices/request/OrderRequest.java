@@ -1,14 +1,13 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.request;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
-
-import javax.validation.Valid;
 
 public class OrderRequest {
 
 	@Valid
-	private List<OrderDetail> orderDetail;
+	private List<OrderDetailRequest> orderDetails;
 	@Valid
 	private int paymentMethod;
 	@Valid
@@ -26,9 +25,9 @@ public class OrderRequest {
 	public OrderRequest() {
 	}
 
-	public OrderRequest(List<OrderDetail> orderDetail, int paymentMethod, int collectType, String address, BigDecimal subTotal,
-			BigDecimal deliveryFee, BigDecimal total, Long userId) {
-		this.orderDetail = orderDetail;
+	public OrderRequest(List<OrderDetailRequest> orderDetails, int paymentMethod, int collectType, String address, BigDecimal subTotal,
+						BigDecimal deliveryFee, BigDecimal total, Long userId) {
+		this.orderDetails = orderDetails;
 		this.paymentMethod = paymentMethod;
 		this.collectType = collectType;
 		this.address = address;
@@ -38,12 +37,12 @@ public class OrderRequest {
 		this.userId = userId;
 	}
 
-	public List<OrderDetail> getOrderDetails() {
-		return orderDetail;
+	public List<OrderDetailRequest> getOrderDetails() {
+		return orderDetails;
 	}
 
-	public void setOrderDetails(List<OrderDetail> orderDetail) {
-		this.orderDetail = orderDetail;
+	public void setOrderDetails(List<OrderDetailRequest> orderDetails) {
+		this.orderDetails = orderDetails;
 	}
 
 	public int getPaymentMethod() {

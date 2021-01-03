@@ -1,25 +1,9 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQuery;
-import javax.persistence.SecondaryTable;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.jpa.repository.Query;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Basic;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.NamedQueries;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 /**
@@ -59,6 +43,7 @@ public class Category implements Serializable {
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
+    @Transient
     @ElementCollection(targetClass=String.class)
     private List<String> images;
 

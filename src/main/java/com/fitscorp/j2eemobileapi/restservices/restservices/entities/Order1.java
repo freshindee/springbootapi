@@ -5,25 +5,10 @@
  */
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
@@ -41,7 +26,7 @@ public class Order1 implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "order_date")
+    @Column(name = "orders_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date orderDate;
     @Column(name = "delivery_address")
@@ -64,19 +49,17 @@ public class Order1 implements Serializable {
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_date")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @Column(name = "enabled")
     private Boolean enabled;
     @Column(name = "modified_by")
     private String modifiedBy;
     @Column(name = "modified_date")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
     @Column(name = "user_id")
     private Long userId;
-    @OneToMany(targetEntity = OrderProduct.class, cascade = CascadeType.ALL, mappedBy = "orders")
-    private List<OrderProduct> orderProductList;
+//    @OneToMany(targetEntity = OrderProduct.class, cascade = CascadeType.ALL, mappedBy = "orders")
+//    private List<OrderProduct> orderProductList;
 
     public Order1() {}
 
@@ -212,13 +195,13 @@ public class Order1 implements Serializable {
 		this.userId = userId;
 	}
 
-	public List<OrderProduct> getOrderProductList() {
-        return orderProductList;
-    }
-
-    public void setOrderProductList(List<OrderProduct> orderProductList) {
-        this.orderProductList = orderProductList;
-    }
+//	public List<OrderProduct> getOrderProductList() {
+//        return orderProductList;
+//    }
+//
+//    public void setOrderProductList(List<OrderProduct> orderProductList) {
+//        this.orderProductList = orderProductList;
+//    }
 
     @Override
     public int hashCode() {

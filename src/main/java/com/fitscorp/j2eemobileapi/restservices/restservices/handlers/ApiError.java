@@ -21,7 +21,6 @@ public class ApiError {
     }
 
     public ApiError(final int status, final String message, final String errorMessage) {
-        super();
         this.status = status;
         this.body = message;
         errorMessages = Arrays.asList(errorMessage);

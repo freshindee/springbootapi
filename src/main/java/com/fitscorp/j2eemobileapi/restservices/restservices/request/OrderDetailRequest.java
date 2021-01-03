@@ -1,14 +1,14 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.request;
 
 
-public class OrderDetail {
+public class OrderDetailRequest {
 
 	private Long productId;
 	private int quantity;
-	
-	public OrderDetail() {}
 
-	public OrderDetail(Long productId, int quantity) {
+	public OrderDetailRequest() {}
+
+	public OrderDetailRequest(Long productId, int quantity) {
 		this.productId = productId;
 		this.quantity = quantity;
 	}

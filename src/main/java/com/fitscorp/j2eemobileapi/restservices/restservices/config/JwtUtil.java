@@ -1,16 +1,15 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.config;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class JwtUtil {
@@ -39,15 +38,20 @@ public class JwtUtil {
 	
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
-		return createToken(claims, userDetails.getUsername());
+		return createToken(claims, userDetails.getUsername(), 14);
 	}
-	
-	private String createToken(Map<String, Object> claims, String subject) {
+
+	public String generateRefreshToken(UserDetails userDetails) {
+		Map<String, Object> claims = new HashMap<>();
+		return createToken(claims, userDetails.getUsername(), 30);
+	}
+
+	private String createToken(Map<String, Object> claims, String subject, int minutes) {
 		return Jwts.builder()
 				.setClaims(claims)
 				.setSubject(subject)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
+				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * minutes)) //TODO: 20 min max
 				.signWith(SignatureAlgorithm.HS256, SECRET_KEY)
 				.compact();
 	}

@@ -1,17 +1,16 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.services;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.UserToken;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.UserToken;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserTokenRepository;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserTokenService {
@@ -26,25 +25,43 @@ public class UserTokenService {
 
 	}
 
-	public UserToken saveUserToken(UserToken userToken) {
+	public UserToken saveUserToken(UserToken userToken, String refreshToken) {
 //		UserToken existingUserToken = userTokenRepository.findByUserId(userToken.getUserId());
 //	
 //		//if not exists throw UserExistsException
 //		if(existingUserToken == null) {
 //			throw new UserExistsException("UserToken already exists in repository");
 //		}
-		
-		return userTokenRepository.save(userToken);
+		UserToken uToken = userTokenRepository.save(userToken);
+		userTokenRepository.updateTokenByRefreshToken(uToken.getUserId(), refreshToken);
+		return uToken;
 	}
 
 	public UserToken getUserTokenByUserId(Long id) throws NotFoundException {
 		 UserToken userToken = userTokenRepository.findByUserId(id);
 
-		if (userToken != null) {
+		if (userToken == null) {
 			throw new NotFoundException("UserToken Not found in user Repository");
 		}
 
 		return userToken;
+	}
+
+	public UserToken getTokenByRefreshToken(Long userId, String token) throws NotFoundException {
+		// Removing Bearer:: doesn't matter either not exist because this will throw not found if it does n;t
+		UserToken userToken = userTokenRepository.findTokenByRefreshToken(userId, token.substring(7));
+
+		if (userToken == null) {
+			throw new UsernameNotFoundException("UserToken Not found in user Repository");
+		}
+
+		return userToken;
+	}
+
+	public Integer updateUserTokenByToken(Long userId, String userToken) {
+		userTokenRepository.updateTokenByRefreshToken(userId, userToken);
+		return 1;
+
 	}
 
 	public UserToken updateUserTokenById(Long id, UserToken userToken) throws NotFoundException {

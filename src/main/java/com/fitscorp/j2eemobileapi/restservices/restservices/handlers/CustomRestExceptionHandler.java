@@ -1,12 +1,7 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.handlers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.management.BadAttributeValueExpException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.InvalidCurrentPasswordException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,7 +25,10 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestControllerAdvice
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -49,7 +47,17 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // 400
-
+    @ExceptionHandler({ InvalidCurrentPasswordException.class })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ApiError handleMethodArgumentNotValid(final InvalidCurrentPasswordException ex) {
+        logger.info(ex.getClass() + ": " + ex.getClass().getName());
+        final List<String> errors = new ArrayList<String>();
+        errors.add(ex.getMessage());
+        final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, errors);
+        return apiError;
+//    	return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+    }
+    
     @ExceptionHandler({ org.springframework.web.server.ResponseStatusException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
@@ -64,7 +72,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         }
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, errors);
-        return handleExceptionInternal(ex, apiError, headers, HttpStatus.valueOf(apiError.getStatus()), request);
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 
     @ExceptionHandler({ UserExistsException.class })
@@ -86,7 +94,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.FORBIDDEN.value(), null, "Wrong credentials, authentication failed!");
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
     
     // 403
@@ -114,7 +122,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         }
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, errors);
-        return handleExceptionInternal(ex, apiError, headers, HttpStatus.valueOf(apiError.getStatus()), request);
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 
     @Override
@@ -125,7 +133,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, error);
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 
     @Override
@@ -136,7 +144,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, error);
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 
     @Override
@@ -147,7 +155,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, error);
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 
     @ExceptionHandler({ MethodArgumentTypeMismatchException.class })
@@ -158,7 +166,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), null, error);
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 
     @ExceptionHandler({ ConstraintViolationException.class })
@@ -201,7 +209,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         System.out.println(ex.getLocalizedMessage());
         final ApiError apiError = new ApiError(HttpStatus.METHOD_NOT_ALLOWED.value(), null, builder.toString());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
     }
 
     // 415

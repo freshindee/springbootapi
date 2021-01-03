@@ -1,23 +1,12 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import javax.persistence.Basic;
-import javax.persistence.GenerationType;
-import javax.persistence.NamedQueries;
 
 /**
  *
@@ -60,6 +49,7 @@ public class Product implements Serializable {
     private Date modifiedDate;
     @Column(name = "sub_category_id")
     private Long subCategoryId;
+    @Transient
     @ElementCollection(targetClass=String.class)
     List<String> images;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
@@ -149,6 +139,7 @@ public class Product implements Serializable {
         this.enabled = enabled;
     }
 
+    @JsonIgnore
     public String getModifiedBy() {
         return modifiedBy;
     }
@@ -157,6 +148,7 @@ public class Product implements Serializable {
         this.modifiedBy = modifiedBy;
     }
 
+    @JsonIgnore
     public Date getModifiedDate() {
         return modifiedDate;
     }

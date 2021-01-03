@@ -1,18 +1,21 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.services;
 
 
-import java.util.List;
-import java.util.Optional;
-
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserRepository;
+
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 
 //Service
@@ -54,14 +57,14 @@ public class UserService {
 	}
 
 	// getUserById
-	public Optional<User> getUserByUserId(Long id) throws NotFoundException {
+	public User getUserByUserId(Long id) throws NotFoundException {
 		Optional<User> user = userRepository.findById(id);
 
 		if (!user.isPresent()) {
 			throw new NotFoundException("User Not found in user Repository");
 		}
 
-		return user;
+		return user.get();
 	}
 
 	// updateUserById
@@ -88,9 +91,39 @@ public class UserService {
 		userRepository.deleteById(id);
 	}
 
-	// getUserByUsername
 	public User getUserByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
 
+	public void changePassword(Long userId, String password) {
+		String encodedPassword = encodePassword(password);
+		userRepository.updatePassword(userId, encodedPassword);
+		return;
+	}
+
+	public String encodePassword(String password) {
+		int strength = 10;
+		BCryptPasswordEncoder bCryptPasswordEncoder =new BCryptPasswordEncoder(strength, new SecureRandom());
+		String encodedPassword = bCryptPasswordEncoder.encode(password);
+		return encodedPassword;
+	}
+
+	public boolean checkIfValidOldPassword(Long userId, String oldPassword) {
+		Optional<User> user = userRepository.findById(userId);
+		if (user.isPresent() && user.get().getPassword() != null) {
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			return passwordEncoder.matches(oldPassword, user.get().getPassword());
+		}
+		throw new UsernameNotFoundException("User not found");
+	}
+
+	public String generateVerificationCode() {
+		// It will generate 6 digit random Number.
+		// from 0 to 999999
+		Random rnd = new Random();
+		int number = rnd.nextInt(999999);
+
+		// this will convert any number sequence into 6 character.
+		return String.format("%06d", number);
+	}
 }

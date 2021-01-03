@@ -1,15 +1,23 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.controller;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
+import com.fitscorp.j2eemobileapi.restservices.restservices.config.JwtUtil;
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.FavProduct;
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.UserToken;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.InvalidCurrentPasswordException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.ApiError;
+import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.RestResponse;
+import com.fitscorp.j2eemobileapi.restservices.restservices.request.*;
+import com.fitscorp.j2eemobileapi.restservices.restservices.response.AuthenticationResponse;
+import com.fitscorp.j2eemobileapi.restservices.restservices.response.ProductResponse;
+import com.fitscorp.j2eemobileapi.restservices.restservices.response.Settings;
+import com.fitscorp.j2eemobileapi.restservices.restservices.response.TokenResponse;
+import com.fitscorp.j2eemobileapi.restservices.restservices.services.EmailService;
+import com.fitscorp.j2eemobileapi.restservices.restservices.services.ProductService;
+import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserService;
+import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,35 +28,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fitscorp.j2eemobileapi.restservices.restservices.config.JwtUtil;
-import com.fitscorp.j2eemobileapi.restservices.restservices.dto.ProductWrapperDTO;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.UserToken;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.ApiError;
-import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.RestResponse;
-import com.fitscorp.j2eemobileapi.restservices.restservices.request.AuthenticationRequest;
-import com.fitscorp.j2eemobileapi.restservices.restservices.request.RegisterRequest;
-import com.fitscorp.j2eemobileapi.restservices.restservices.response.AuthenticationResponse;
-import com.fitscorp.j2eemobileapi.restservices.restservices.response.Settings;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.services.ProductService;
-import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserService;
-import com.fitscorp.j2eemobileapi.restservices.restservices.services.UserTokenService;
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
@@ -62,6 +48,9 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	EmailService emailService;
 	
 	@Autowired
 	JwtUtil jwtUtil;
@@ -77,9 +66,8 @@ public class UserController {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 		} catch (Exception e) {
-			final ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), null, "Authorization failed to requested resource!");
-//			throw new BadCredentialsException("Incorrect username or password", e);
-			return new ResponseEntity<ApiError>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
+			final ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), null, "Wrong credentials, authentication failed!");
+			return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
 		}
 		
 		UserDetails userDetails = userDetailService.loadUserByUsername(request.getUsername());
@@ -101,7 +89,7 @@ public class UserController {
 			user.setUsername(request.getEmail());
 			user.setIs_email_verified(false);
 			user.setName(request.getName());
-			user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
+			user.setPassword(userService.encodePassword(request.getPassword()));
 			user.setPhoneNo(request.getPhoneNo());
 			user.setStatus(0);
 			
@@ -119,9 +107,29 @@ public class UserController {
 		}
 	}
 
-	@GetMapping("/{id}")
-	public Optional<User> getUserByUserId(@PathVariable("id") Long id) {
+	@PostMapping("/forgot-password")
+	public ResponseEntity<?> handleForgotPassword(@Valid @RequestBody ForgotPasswordRequest request, UriComponentsBuilder builder) throws UserExistsException, NotFoundException {
+		User user = userService.getUserByEmail(request.getEmail());
+		if (user == null)
+			throw new UsernameNotFoundException("User not found for the provided email address");
+		String randomCode = userService.generateVerificationCode();
+		emailService.sendSimpleMessage(
+			request.getEmail(),
+			"Jass Express password recovery",
+			"Use "+ randomCode +" code to login to the app and change password"
+		);
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DATE, 1);
+		user.setPassword_expiry(c.getTime());
+		user.setPassword(userService.encodePassword(randomCode));
+		userService.updateUserById(user.getUserId(), user);
+		return new ResponseEntity<Object>(new RestResponse<String>(204,null, null), 
+				new HttpHeaders(), 
+				HttpStatus.NO_CONTENT);
+	}
 
+	@GetMapping("/{id}")
+	public User getUserByUserId(@PathVariable("id") Long id) {
 		try {
 			return userService.getUserByUserId(id);
 		} catch (NotFoundException ex) {
@@ -130,10 +138,10 @@ public class UserController {
 
 	}
 
-	@GetMapping("")
-	public List<User> getAllUsers() {
-		return userService.getAllUsers();
-	}
+//	@GetMapping("")
+//	public List<User> getAllUsers() {
+//		return userService.getAllUsers();
+//	}
 	
 	@PutMapping("/{id}")
 	public User updateUserById(@PathVariable("id") Long id, @RequestBody User user) {
@@ -167,7 +175,7 @@ public class UserController {
 
 	private AuthenticationResponse saveUserDetailsAndGenerateAuthResponse(UserDetails userDetails, User user) {
 		// By initial design @username and @email hold the exact same value
-		String refreshToken = jwtUtil.generateToken(userDetails);
+		String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 		String accessToken = jwtUtil.generateToken(userDetails);
 		
 		UserToken token = new UserToken();
@@ -193,17 +201,91 @@ public class UserController {
 			refreshToken
 		);
 		
-		userTokenService.saveUserToken(token);
+		userTokenService.saveUserToken(token, refreshToken);
 		return authRes;
 	}
 
+	@GetMapping("/{userId}/auth/extend")
+	public TokenResponse extendAuth(@PathVariable Long userId,@RequestHeader(value="Authorization") String refreshToken) throws NotFoundException {
+		// refreshToken coming through Authorization header param
+		UserToken userToken = userTokenService.getTokenByRefreshToken(userId, refreshToken);
+		User user = userService.getUserByUserId(userToken.getUserId());
+		UserDetails userDetails = userDetailService
+				.loadUserByUsername(user.getUsername());
+
+		TokenResponse tokenRes = new TokenResponse(
+				jwtUtil.generateToken(userDetails),
+				jwtUtil.generateRefreshToken(userDetails)
+		);
+		userTokenService.updateUserTokenByToken(userId, tokenRes.getRefreshToken());
+		return tokenRes;
+	}
+
+	@GetMapping("/{userId}/info")
+	public AuthenticationResponse getUserInfo(@PathVariable Long userId) {
+		try {
+			User user = userService.getUserByUserId(userId);
+
+			AuthenticationResponse authRes = new AuthenticationResponse(
+					user.getUserId(),
+					user.getName(),
+					user.getPassword(),
+					user.getPhoneNo(),
+					user.getAddress(),
+					user.getEmail(),
+					user.getPasswordStatus(),
+					user.getStatus(),
+					new Settings(new BigDecimal(30.0)),
+					null,
+					null
+			);
+			return authRes;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new AuthenticationResponse();
+		}
+	}
+
+	@PostMapping("/{userId}/password-change")
+	public ResponseEntity<?> changePassword(@PathVariable Long userId,
+			  @RequestBody ChagePasswordRequest request) throws InvalidCurrentPasswordException {
+		System.out.println("User id" + userId.toString());
+		if (!userService.checkIfValidOldPassword(userId, request.getCurrentPassword())) {
+	        throw new InvalidCurrentPasswordException("Invalid current password");
+	    }
+		userService.changePassword(userId, request.getNewPassword());
+		return new ResponseEntity<>(null, new HttpHeaders(), HttpStatus.NO_CONTENT);
+	}
+	
+	// User Favorite products api endpoints
+
 	@GetMapping("/{userId}/fav-list")
-	public ProductWrapperDTO getFavoriteProducts(@PathVariable Long userId) {
+	public ProductResponse getFavoriteProducts(@PathVariable Long userId) {
 		try {
 			return productService.getFavoriteProducts(userId);
-		} catch (NotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			return new ProductWrapperDTO(new ArrayList<>());
+			return new ProductResponse(new ArrayList<>());
+		}
+	}
+
+	@PostMapping("/{userId}/fav-list")
+	public List<FavProduct> addFavoriteProducts(@PathVariable Long userId, @RequestBody FavoriteRequest request) {
+		try {
+			return productService.addFavoriteProducts(userId, request);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@DeleteMapping("/{userId}/fav-list")
+	public List<FavProduct> deleteFavoriteProducts(@PathVariable Long userId, @RequestBody FavoriteRequest request) {
+		try {
+			return productService.deleteFavoriteProducts(userId, request);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 }

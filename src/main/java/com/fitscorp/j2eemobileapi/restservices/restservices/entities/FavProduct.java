@@ -5,20 +5,10 @@
  */
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
@@ -36,6 +26,10 @@ public class FavProduct implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private BigInteger id;
+    @Column(name = "product_id")
+    private BigInteger productId;
+    @Column(name = "user_id")
+    private BigInteger userId;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_date")
@@ -48,24 +42,34 @@ public class FavProduct implements Serializable {
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
-    @Column(name = "product_id")
-    private BigInteger productId;
-    @Column(name = "user_id")
-    private BigInteger userId;
 
     public FavProduct() {
     }
     
-    public FavProduct(BigInteger id, BigInteger productId, BigInteger userId, String createdBy, Date createdDate, Boolean enabled, String modifiedBy,
-			Date modifiedDate) {
-		this.id = id;
+    public FavProduct(BigInteger productId, BigInteger userId, String createdBy, Date createdDate, Boolean enabled,
+			String modifiedBy, Date modifiedDate) {
+		super();
+		this.productId = productId;
+		this.userId = userId;
 		this.createdBy = createdBy;
 		this.createdDate = createdDate;
 		this.enabled = enabled;
 		this.modifiedBy = modifiedBy;
 		this.modifiedDate = modifiedDate;
-		this.productId = productId;
-		this.userId = userId;
+	}
+
+
+
+	public FavProduct(BigInteger id, BigInteger userId, BigInteger productId, String createdBy, Date createdDate, Boolean enabled, String modifiedBy,
+			Date modifiedDate) {
+		this.id = id;
+        this.productId = productId;
+        this.userId = userId;
+		this.createdBy = createdBy;
+		this.createdDate = createdDate;
+		this.enabled = enabled;
+		this.modifiedBy = modifiedBy;
+		this.modifiedDate = modifiedDate;
 	}
 
 

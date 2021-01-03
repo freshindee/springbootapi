@@ -1,0 +1,31 @@
+package com.fitscorp.j2eemobileapi.restservices.restservices.request;
+
+public class ChagePasswordRequest {
+
+	private String currentPassword;
+	private String newPassword;
+	
+	public ChagePasswordRequest() {}
+	
+	public ChagePasswordRequest(String currentPassword, String newPassword) {
+		this.currentPassword = currentPassword;
+		this.newPassword = newPassword;
+	}
+
+	public String getCurrentPassword() {
+		return currentPassword;
+	}
+
+	public void setCurrentPassword(String currentPassword) {
+		this.currentPassword = currentPassword;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+	
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+	
+}

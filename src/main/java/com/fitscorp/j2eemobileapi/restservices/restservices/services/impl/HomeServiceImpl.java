@@ -8,13 +8,15 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.CategoryRepository;
+import com.fitscorp.j2eemobileapi.restservices.restservices.repository.FavProductRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.ProductRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.SubCategoryRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.services.HomeService;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class HomeServiceImpl implements HomeService {
@@ -27,6 +29,9 @@ public class HomeServiceImpl implements HomeService {
 
     @Autowired
 	private ProductRepository productRepository;
+
+    @Autowired
+    private FavProductRepository favProductRepository;
 
     @Override
     public HomeDTO initHome(Integer userId) throws Exception {
@@ -58,6 +63,12 @@ public class HomeServiceImpl implements HomeService {
                 p.setPromoStartDate(subCategory.getPromotionStartDate());
                 p.setPromoEndDate(subCategory.getPromotionEndDate());
                 p.setPromoDescription(subCategory.getPromotionDescription());
+
+                Boolean isFavorite = favProductRepository
+                        .findIfProductIsFavoriteByProductId(product.getId()) != null;
+
+                p.setIsFavorite(isFavorite);
+
             	p.setImages(findAllImages(product.getId()));
                 promotions.add(p);
 
@@ -97,6 +108,11 @@ public class HomeServiceImpl implements HomeService {
             p.setPromoEndDate(subCategory.getPromotionEndDate());
             p.setPromoDescription(subCategory.getPromotionDescription());
         	p.setImages(findAllImages(product.getId()));
+
+            Boolean isFavorite = favProductRepository
+                    .findIfProductIsFavoriteByProductId(product.getId()) != null;
+
+            p.setIsFavorite(isFavorite);
         	recommends.add(p);
 
         }

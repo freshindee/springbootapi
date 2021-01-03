@@ -5,28 +5,16 @@
  */
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
  * @author User
  */
 @Entity
-@Table(name = "order_product")
+@Table(name = "orders_product")
 @NamedQueries({
     @NamedQuery(name = "OrderProduct.findAll", query = "SELECT o FROM OrderProduct o")})
 public class OrderProduct implements Serializable {
@@ -37,8 +25,10 @@ public class OrderProduct implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "order_id", insertable=false, updatable=false)
+    @Column(name = "orders_id")
     private Long orderId;
+    @Column(name = "product_id")
+    private Long productId;
     @Column(name = "quantity")
     private Integer quantity;
     @Column(name = "created_by")
@@ -53,12 +43,12 @@ public class OrderProduct implements Serializable {
     @Column(name = "modified_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedDate;
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Order1 orders;
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Product product;
+//    @JoinColumn(name = "order_id", referencedColumnName = "id")
+//    @ManyToOne(optional = false)
+//    private Order1 orders;
+//    @JoinColumn(name = "product_id", referencedColumnName = "id")
+//    @ManyToOne(optional = false)
+//    private Product product;
 
     public OrderProduct() {
     }
@@ -123,21 +113,29 @@ public class OrderProduct implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
-    public Order1 getOrder() {
-        return orders;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setOrder(Order1 order) {
-        this.orders = order;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+    //    public Order1 getOrder() {
+//        return orders;
+//    }
+//
+//    public void setOrder(Order1 order) {
+//        this.orders = order;
+//    }
+//
+//    public Product getProduct() {
+//        return product;
+//    }
+//
+//    public void setProduct(Product product) {
+//        this.product = product;
+//    }
 
     public Long getOrderId() {
 		return orderId;
@@ -169,7 +167,16 @@ public class OrderProduct implements Serializable {
 
     @Override
     public String toString() {
-        return "com.fitscorp.j2eemobileapi.restservices.entities.OrderProduct[ id=" + id + " ]";
+        return "OrderProduct{" +
+                "id=" + id +
+                ", orderId=" + orderId +
+                ", quantity=" + quantity +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdDate=" + createdDate +
+                ", enabled=" + enabled +
+                ", modifiedBy='" + modifiedBy + '\'' +
+                ", modifiedDate=" + modifiedDate +
+                ", productId=" + productId +
+                '}';
     }
-    
 }

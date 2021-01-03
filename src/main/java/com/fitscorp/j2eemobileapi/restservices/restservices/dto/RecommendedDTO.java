@@ -20,6 +20,7 @@ public class RecommendedDTO {
     private Date promoStartDate;
     private Date promoEndDate;
     private String promoDescription;
+    private Boolean isFavorite;
     private List<String> images;
 
     public Long getCategoryId() {
@@ -134,7 +135,15 @@ public class RecommendedDTO {
         this.promoDescription = promoDescription;
     }
 
-	public List<String> getImages() {
+    public Boolean getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public List<String> getImages() {
 		return images;
 	}
 

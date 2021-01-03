@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.ElementCollection;
-
 public class PromotionDTO {
     
     private Long categoryId;
@@ -21,6 +19,7 @@ public class PromotionDTO {
     private BigDecimal price;
     private BigDecimal discountedPrice;
     private String unit;
+    private Boolean isFavorite;
     private List<String> images;
     
     
@@ -29,7 +28,7 @@ public class PromotionDTO {
     
 	public PromotionDTO(Long categoryId, Long storeId, Long productId, Long subCategoryId, String subCategoryName,
 			Date promoStartDate, Date promoEndDate, String promoDescription, String name, String description,
-			BigDecimal price, BigDecimal discountedPrice, String unit, List<String> images) {
+			BigDecimal price, BigDecimal discountedPrice, String unit, Boolean isFavorite, List<String> images) {
 		super();
 		this.categoryId = categoryId;
 		this.storeId = storeId;
@@ -44,6 +43,7 @@ public class PromotionDTO {
 		this.price = price;
 		this.discountedPrice = discountedPrice;
 		this.unit = unit;
+		this.isFavorite = isFavorite;
 		this.images = images;
 	}
 
@@ -157,7 +157,15 @@ public class PromotionDTO {
 		this.subCategoryName = subCategoryName;
 	}
 
-	public List<String> getImages() {
+    public Boolean getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public List<String> getImages() {
 		return images;
 	}
 

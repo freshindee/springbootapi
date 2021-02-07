@@ -9,6 +9,7 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundE
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.OrderProductRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.OrderRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.ProductRepository;
+import com.fitscorp.j2eemobileapi.restservices.restservices.repository.UserRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.request.ConfirmOrderRequest;
 import com.fitscorp.j2eemobileapi.restservices.restservices.request.OrderDetailRequest;
 import com.fitscorp.j2eemobileapi.restservices.restservices.request.OrderRequest;
@@ -16,6 +17,7 @@ import com.fitscorp.j2eemobileapi.restservices.restservices.response.OrderDetail
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,6 +38,9 @@ public class OrderService {
     @Autowired
     private OrderProductRepository orderProductRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public Iterable<Order1> findAllOrders() {
         return orderRepository.findAll();
     }
@@ -45,6 +50,10 @@ public class OrderService {
     }
 
     public List<OrderDTO> findAllOrdersByUserId(Long userId, Pageable pageable) throws Exception {
+        if (!userRepository.findById(userId.longValue()).isPresent()) {
+            throw new UsernameNotFoundException("User account not activated");
+        }
+
         Page<Order1> orders = orderRepository.findAllOrdersByUserId(userId, pageable);
         List<OrderDTO> orderDTOs = new ArrayList<>();
         for (Order1 order : orders) {
@@ -89,7 +98,10 @@ public class OrderService {
         return orderDTOs;
     }
 
-    public Long saveOrder(Integer userId, OrderRequest request) {
+    public Long saveOrder(Integer userId, OrderRequest request) throws Exception {
+        if (!userRepository.findById(userId.longValue()).isPresent()) {
+            throw new UsernameNotFoundException("User account not activated");
+        }
         Order1 order = new Order1();
         order.setPaymentMethod(request.getPaymentMethod());
         order.setCollectType(request.getCollectType());
@@ -112,7 +124,6 @@ public class OrderService {
         List<OrderProduct> orderProducts = new ArrayList<>();
 
         Order1 resultingOrder = orderRepository.save(order);
-        System.out.println("Order id" + resultingOrder.getId());
 
         for (OrderDetailRequest detail : request.getOrderDetails()) {
             Optional<Product> product = productRepository.findById(detail.getProductId());
@@ -138,6 +149,10 @@ public class OrderService {
     }
 
     public Integer saveConfirmOrder(Integer userId, ConfirmOrderRequest request) throws NotFoundException {
+        if (!userRepository.findById(userId.longValue()).isPresent()) {
+            throw new UsernameNotFoundException("User account not activated");
+        }
+
         Optional<Order1> existingOrder = orderRepository.findByUserNOrderId(userId, request.getOrderId());
         if (existingOrder.isPresent()) {
             existingOrder.get().setPaymentReference(request.getPaymentReference());

@@ -1,24 +1,12 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.entities;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Where;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //Entity 
 @Entity
 @Table(name = "user")
-@Where(clause = "enabled= '1'")
+//@Where(clause = "enabled= '1'")
 public class User {
 
 	@Id
@@ -69,7 +57,7 @@ public class User {
 	private int status;
 	@OneToOne
     @JoinColumn(name = "id", referencedColumnName = "user_id")
-	@Where(clause = "enabled= '1'")
+//	@Where(clause = "enabled= '1'")
 	private UserToken tokens;
 
 	public User() {

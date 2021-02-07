@@ -1,17 +1,16 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.controller;
 
 import com.fitscorp.j2eemobileapi.restservices.restservices.config.JwtUtil;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.FavProduct;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.User;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.UserToken;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.InvalidCurrentPasswordException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserNotActivatedException;
 import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.ApiError;
 import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.RestResponse;
 import com.fitscorp.j2eemobileapi.restservices.restservices.request.*;
 import com.fitscorp.j2eemobileapi.restservices.restservices.response.AuthenticationResponse;
-import com.fitscorp.j2eemobileapi.restservices.restservices.response.ProductResponse;
 import com.fitscorp.j2eemobileapi.restservices.restservices.response.Settings;
 import com.fitscorp.j2eemobileapi.restservices.restservices.response.TokenResponse;
 import com.fitscorp.j2eemobileapi.restservices.restservices.services.EmailService;
@@ -62,10 +61,23 @@ public class UserController {
 	private ProductService productService;
 
 	@RequestMapping(value = "/auth", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticateToken(@Valid @RequestBody AuthenticationRequest request) throws BadCredentialsException {
-		try {
+	public Object createAuthenticateToken(@Valid @RequestBody AuthenticationRequest request) throws BadCredentialsException {
+
+	    try {
+	    	User user = userService.getUserByEmail(request.getUsername());
+			userService.checkAccountActivation(user);
+			if (user == null) {
+				throw new UsernameNotFoundException("User does not exists!");
+			}
+
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-		} catch (Exception e) {
+		} catch (UserNotActivatedException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("Please activate your account!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+        } catch (UsernameNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("User does not exists!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
 			final ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value(), null, "Wrong credentials, authentication failed!");
 			return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.valueOf(apiError.getStatus()));
 		}
@@ -87,11 +99,12 @@ public class UserController {
 			user.setCreated_date(new Date());
 			user.setEmail(request.getEmail());
 			user.setUsername(request.getEmail());
-			user.setIs_email_verified(false);
+			user.setIs_email_verified(true);
 			user.setName(request.getName());
 			user.setPassword(userService.encodePassword(request.getPassword()));
 			user.setPhoneNo(request.getPhoneNo());
-			user.setStatus(0);
+			// Enabled
+			user.setStatus(1);
 			
 			User createdUser = userService.createUser(user);
 			if (createdUser != null) {
@@ -99,7 +112,7 @@ public class UserController {
 				headers.setLocation(builder.path("/users/{id}").buildAndExpand(createdUser.getUserId()).toUri());
 				UserDetails userDetails = userDetailService.loadUserByUsername(createdUser.getEmail());
 				AuthenticationResponse authRes = saveUserDetailsAndGenerateAuthResponse(userDetails, createdUser);
-				return new ResponseEntity<AuthenticationResponse>(authRes, headers, HttpStatus.OK);
+				return new ResponseEntity<>(authRes, headers, HttpStatus.OK);
 			}
 			return new ResponseEntity<Object>(new RestResponse<String>(400, Arrays.asList("Retriving user failed"), null), new HttpHeaders(), HttpStatus.BAD_REQUEST);
 		} catch(UserExistsException ex) {
@@ -129,7 +142,7 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}")
-	public User getUserByUserId(@PathVariable("id") Long id) {
+	public Object getUserByUserId(@PathVariable("id") Long id) {
 		try {
 			return userService.getUserByUserId(id);
 		} catch (NotFoundException ex) {
@@ -177,7 +190,7 @@ public class UserController {
 		// By initial design @username and @email hold the exact same value
 		String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 		String accessToken = jwtUtil.generateToken(userDetails);
-		
+
 		UserToken token = new UserToken();
 		token.setAccessToken(accessToken);
 		token.setCreatedBy(user.getEmail());
@@ -186,70 +199,64 @@ public class UserController {
 		token.setStatus(1);
 		token.setUserId(user.getUserId());
 		user.setTokens(token);
-		
+
 		AuthenticationResponse authRes = new AuthenticationResponse(
-			user.getUserId(), 
-			user.getName(), 
-			user.getPassword(), 
-			user.getPhoneNo(), 
+			user.getUserId(),
+			user.getName(),
+			user.getPassword(),
+			user.getPhoneNo(),
 			user.getAddress(),
-			user.getEmail(), 
-			user.getPasswordStatus(), 
-			user.getStatus(), 
-			new Settings(new BigDecimal(30.0)),
+			user.getEmail(),
+			user.getPasswordStatus(),
+			user.getStatus(),
+			new Settings(new BigDecimal(30.0)), //TODO: hard coded delivery fee
 			accessToken,
 			refreshToken
 		);
-		
+
 		userTokenService.saveUserToken(token, refreshToken);
 		return authRes;
 	}
 
 	@GetMapping("/{userId}/auth/extend")
-	public TokenResponse extendAuth(@PathVariable Long userId,@RequestHeader(value="Authorization") String refreshToken) throws NotFoundException {
-		// refreshToken coming through Authorization header param
-		UserToken userToken = userTokenService.getTokenByRefreshToken(userId, refreshToken);
-		User user = userService.getUserByUserId(userToken.getUserId());
-		UserDetails userDetails = userDetailService
-				.loadUserByUsername(user.getUsername());
+	public Object extendAuth(@PathVariable Long userId,@RequestHeader(value="Authorization") String refreshToken) throws UserNotActivatedException, NotFoundException {
 
-		TokenResponse tokenRes = new TokenResponse(
-				jwtUtil.generateToken(userDetails),
-				jwtUtil.generateRefreshToken(userDetails)
-		);
-		userTokenService.updateUserTokenByToken(userId, tokenRes.getRefreshToken());
-		return tokenRes;
+        // refreshToken coming through Authorization header param
+        UserToken userToken = userTokenService.getTokenByRefreshToken(userId, refreshToken);
+
+        User user = userService.getUserByUserId(userToken.getUserId());
+        if (user == null) {
+            throw new UsernameNotFoundException("User does not exists!");
+        }
+        try {
+            userService.checkAccountActivation(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("Please activate your account!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+        }
+
+        UserDetails userDetails = userDetailService
+                .loadUserByUsername(user.getUsername());
+
+        TokenResponse tokenRes = new TokenResponse(
+                jwtUtil.generateToken(userDetails),
+                jwtUtil.generateRefreshToken(userDetails)
+        );
+        userTokenService.updateUserTokenByToken(userId, tokenRes.getRefreshToken());
+        return tokenRes;
 	}
 
 	@GetMapping("/{userId}/info")
-	public AuthenticationResponse getUserInfo(@PathVariable Long userId) {
-		try {
-			User user = userService.getUserByUserId(userId);
-
-			AuthenticationResponse authRes = new AuthenticationResponse(
-					user.getUserId(),
-					user.getName(),
-					user.getPassword(),
-					user.getPhoneNo(),
-					user.getAddress(),
-					user.getEmail(),
-					user.getPasswordStatus(),
-					user.getStatus(),
-					new Settings(new BigDecimal(30.0)),
-					null,
-					null
-			);
-			return authRes;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new AuthenticationResponse();
-		}
+	public Object getUserInfo(@PathVariable Long userId) {
+	    return userService.getUserInfo(userId);
 	}
 
 	@PostMapping("/{userId}/password-change")
 	public ResponseEntity<?> changePassword(@PathVariable Long userId,
-			  @RequestBody ChagePasswordRequest request) throws InvalidCurrentPasswordException {
-		System.out.println("User id" + userId.toString());
+			  @RequestBody ChagePasswordRequest request) throws Exception {
+        if (userService.getUserByUserId(userId.longValue()) == null) {
+            throw new UsernameNotFoundException("User account not activated");
+        }
 		if (!userService.checkIfValidOldPassword(userId, request.getCurrentPassword())) {
 	        throw new InvalidCurrentPasswordException("Invalid current password");
 	    }
@@ -260,32 +267,17 @@ public class UserController {
 	// User Favorite products api endpoints
 
 	@GetMapping("/{userId}/fav-list")
-	public ProductResponse getFavoriteProducts(@PathVariable Long userId) {
-		try {
-			return productService.getFavoriteProducts(userId);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ProductResponse(new ArrayList<>());
-		}
+	public Object getFavoriteProducts(@PathVariable Long userId) {
+        return productService.getFavoriteProducts(userId);
 	}
 
 	@PostMapping("/{userId}/fav-list")
-	public List<FavProduct> addFavoriteProducts(@PathVariable Long userId, @RequestBody FavoriteRequest request) {
-		try {
-			return productService.addFavoriteProducts(userId, request);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	public Object addFavoriteProducts(@PathVariable Long userId, @RequestBody FavoriteRequest request) {
+        return productService.addFavoriteProducts(userId, request);
 	}
 
 	@DeleteMapping("/{userId}/fav-list")
-	public List<FavProduct> deleteFavoriteProducts(@PathVariable Long userId, @RequestBody FavoriteRequest request) {
-		try {
-			return productService.deleteFavoriteProducts(userId, request);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	public Object deleteFavoriteProducts(@PathVariable Long userId, @RequestBody FavoriteRequest request) {
+		return productService.deleteFavoriteProducts(userId, request);
 	}
 }

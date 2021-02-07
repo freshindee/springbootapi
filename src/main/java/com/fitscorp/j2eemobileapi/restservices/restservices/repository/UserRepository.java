@@ -15,11 +15,17 @@ public interface UserRepository  extends JpaRepository<User, Long>{
 
 	@Query(nativeQuery = true, value = "SELECT * FROM user WHERE email_address = :email")
 	User findByEmail(String email);
-	
+
 	@Transactional
 	@Modifying
 	@Query(nativeQuery = true, value = "UPDATE User u SET u.password = :password WHERE u.id = :userId")
 	void updatePassword(Long userId, String password);
+
+	@Query(nativeQuery = true, value = "SELECT enabled FROM user WHERE email_address = :email")
+    Boolean findUserEnabled(String email);
+
+	@Query(nativeQuery = true, value = "SELECT is_email_verified FROM user WHERE email_address = :email")
+	Boolean findUserEmailVerified(String email);
 }
 
 

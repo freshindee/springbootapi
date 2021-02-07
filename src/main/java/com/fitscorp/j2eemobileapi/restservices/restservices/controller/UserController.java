@@ -79,7 +79,7 @@ public class UserController {
 
 	// Register User Method
 	@PostMapping("/registrations")
-	public ResponseEntity<?> createUser(@Valid @RequestBody RegisterRequest request, UriComponentsBuilder builder) throws UserExistsException {
+	public ResponseEntity<?> createUser(@Valid @RequestBody RegisterRequest request, UriComponentsBuilder builder) {
 		try {
 			if (userService.getUserByEmail(request.getEmail()) != null)
 				throw new UserExistsException("Email address already exists");

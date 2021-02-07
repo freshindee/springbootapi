@@ -34,14 +34,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests()
-			.antMatchers("/users/**").permitAll()
+			.antMatchers("/users/auth").permitAll()
+			.antMatchers("/users/registrations").permitAll()
+			.antMatchers("/users/{0-9}/auth/extend").permitAll()
 			.antMatchers("/-1/**").permitAll()
 			.antMatchers("/images/**").permitAll()
 			.antMatchers("/{0-9}/products/**").permitAll()
 			.antMatchers("/products/**").permitAll()
 			.antMatchers("/{0-9}/sub/**").permitAll()
 			.antMatchers("/promotions/**").permitAll()
-			.antMatchers("/users/registrations").permitAll()
 			.anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint())

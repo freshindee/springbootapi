@@ -2,11 +2,10 @@ package com.fitscorp.j2eemobileapi.restservices.restservices.services;
 
 import com.fitscorp.j2eemobileapi.restservices.restservices.dto.ProductDTO;
 import com.fitscorp.j2eemobileapi.restservices.restservices.dto.PromotionDTO;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.FavProduct;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Product;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.*;
 import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserNotActivatedException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.handlers.RestResponse;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.CategoryRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.FavProductRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.ProductRepository;
@@ -17,13 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -40,6 +39,9 @@ public class ProductService {
 
 	@Autowired
 	private FavProductRepository favProductRepository;
+
+	@Autowired
+	private UserService userService;
 
 	public List<Product> getAllProducts() {
 		return productRepository.findAll();
@@ -78,22 +80,8 @@ public class ProductService {
 
 			Boolean isFavorite = favProductRepository
 					.findIfProductIsFavoriteByProductId(product.getId()) != null;
-			
-			ProductDTO prod = new ProductDTO(
-				subCat.getCategoryId(), 
-				subCat.getStoreId(), 
-				product.getId(), 
-				product.getSubCategoryId(), 
-				cat.getCategoryName(),
-				subCat.getName(),
-				product.getName(), 
-				product.getDescription(),
-				product.getPrice(), 
-				product.getDiscountedPrice(), 
-				product.getUnit(),
-				isFavorite,
-				product.getImages()
-			);
+
+			ProductDTO prod = getProductDTO(subCat, cat, product, isFavorite);
 			productDtos.add(prod);
 		}
 		return new ProductResponse(productDtos);
@@ -142,54 +130,7 @@ public class ProductService {
 		}
 		return promos;
 	}
-	
-	public ProductResponse getFavoriteProducts(Long userId) throws NotFoundException {
-		List<FavProduct> favProducts = favProductRepository.findFavoriteProductsByUserId(userId);
-		List<ProductDTO> productDtos = new ArrayList<>();
-		SubCategory subCat;
-		Category cat;
-		
-		if (favProducts == null || favProducts.size() == 0) {
-			return new ProductResponse(new ArrayList<>());
-		}
-		
-		for (FavProduct favProd : favProducts) {
-			Optional<Product> product = productRepository.findById(favProd.getProductId().longValue());
-			
-			if (!product.isPresent()) {
-				break;
-			}
-			
-			try {
-				subCat = subCategoryRepository.findById(product.get().getSubCategoryId()).get();
-				cat = categoryRepository.findById(product.get().getSubCategoryId()).get();
-			} catch (Exception no) {
-				throw new NotFoundException("Not found");
-			}
-			
-			List<String> images = findAllImages(product.get().getId());
-			product.get().setImages(images);
-			
-			ProductDTO prod = new ProductDTO(
-				subCat.getCategoryId(), 
-				subCat.getStoreId(), 
-				product.get().getId(), 
-				product.get().getSubCategoryId(), 
-				cat.getCategoryName(),
-				subCat.getName(),
-				product.get().getName(), 
-				product.get().getDescription(),
-				product.get().getPrice(), 
-				product.get().getDiscountedPrice(), 
-				product.get().getUnit(),
-				true,
-				product.get().getImages()
-			);
-			productDtos.add(prod);
-		}
-		return new ProductResponse(productDtos);
-	}
-	
+
 	public ProductResponse findProductsByName(String criteria, @PageableDefault(page = 0, value = Integer.MAX_VALUE) Pageable pageable) throws NotFoundException {
 		Slice<Product> products = productRepository.findProductsByName(criteria, pageable);
 		List<ProductDTO> productDtos = new ArrayList<>();
@@ -214,56 +155,127 @@ public class ProductService {
 			
 			List<String> images = findAllImages(product.getId());
 			product.setImages(images);
-			
-			ProductDTO prod = new ProductDTO(
-				subCat.getCategoryId(), 
-				subCat.getStoreId(), 
-				product.getId(), 
-				product.getSubCategoryId(), 
-				cat.getCategoryName(),
-				subCat.getName(),
-				product.getName(), 
-				product.getDescription(),
-				product.getPrice(), 
-				product.getDiscountedPrice(), 
-				product.getUnit(),
-				true,
-				product.getImages()
-			);
+
+			ProductDTO prod = getProductDTO(subCat, cat, product, true);
 			productDtos.add(prod);
 		}
 		return new ProductResponse(productDtos);
+	}
+
+	public Object getFavoriteProducts(Long userId) {
+		try {userService.checkAccountActivation(userId);
+
+			List<FavProduct> favProducts = favProductRepository.findFavoriteProductsByUserId(userId);
+			List<ProductDTO> productDtos = new ArrayList<>();
+			SubCategory subCat;
+			Category cat;
+
+			if (favProducts == null || favProducts.size() == 0) {
+				return new ProductResponse(new ArrayList<>());
+			}
+
+			for (FavProduct favProd : favProducts) {
+				Optional<Product> product = productRepository.findById(favProd.getProductId().longValue());
+
+				if (!product.isPresent()) {
+					break;
+				}
+
+				try {
+					subCat = subCategoryRepository.findById(product.get().getSubCategoryId()).get();
+					cat = categoryRepository.findById(product.get().getSubCategoryId()).get();
+				} catch (Exception no) {
+					throw new NotFoundException("Not found");
+				}
+
+				List<String> images = findAllImages(product.get().getId());
+				product.get().setImages(images);
+
+				ProductDTO prod = getProductDTO(subCat, cat, product.get(), true);
+				productDtos.add(prod);
+			}
+			return new ProductResponse(productDtos);
+		} catch (UserNotActivatedException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("Please activate your account!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("User not exists!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ProductResponse(new ArrayList<>());
+		}
+	}
+
+	public Object addFavoriteProducts(Long userId, FavoriteRequest request) {
+		try {
+			userService.checkAccountActivation(userId);
+			List<FavProduct> favProducts = new ArrayList<>();
+			Date date = new Date();
+			for (Long productId : request.getProductIds()) {
+				Product product = productRepository.findById(productId).get();
+				favProducts.add(new FavProduct(
+						BigInteger.valueOf(product.getId()),
+						BigInteger.valueOf(userId),
+						userId.toString(),
+						date,
+						false,
+						userId.toString(),
+						date
+				));
+			}
+			return favProductRepository.saveAll(favProducts);
+		} catch (UserNotActivatedException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("Please activate your account!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("User not exists!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Object deleteFavoriteProducts(Long userId, FavoriteRequest request) {
+		try {
+			userService.checkAccountActivation(userId);
+			List<FavProduct> favProducts = new ArrayList<>();
+			for (Long productId : request.getProductIds()) {
+				List<FavProduct> prods = favProductRepository.findFavoriteProductsProductId(productId, userId);
+				favProductRepository.deleteAll(prods);
+				favProducts.addAll(prods);
+			}
+			return favProducts;
+		} catch (UserNotActivatedException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(new RestResponse<String>(401, Arrays.asList("Please activate your account!"), null), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private ProductDTO getProductDTO(SubCategory subCat, Category cat, Product product, boolean b) {
+		return new ProductDTO(
+				subCat.getCategoryId(),
+				subCat.getStoreId(),
+				product.getId(),
+				product.getSubCategoryId(),
+				cat.getCategoryName(),
+				subCat.getName(),
+				product.getName(),
+				product.getDescription(),
+				product.getPrice(),
+				product.getDiscountedPrice(),
+				product.getUnit(),
+				b,
+				product.getImages()
+		);
 	}
 
 	public List<String> findAllImages(Long catId) {
 		return subCategoryRepository.findAllImages(catId);
 	}
 
-	public List<FavProduct> addFavoriteProducts(Long userId, FavoriteRequest request) {
-		List<FavProduct> favProducts = new ArrayList<>();
-		Date date = new Date();
-		for (Long productId : request.getProductIds()) {
-			Product product = productRepository.findById(productId).get();
-			favProducts.add(new FavProduct(
-				BigInteger.valueOf(product.getId()),
-				BigInteger.valueOf(userId),
-				userId.toString(),
-				date,
-				false,
-				userId.toString(),
-				date
-			));
-		}
-		return favProductRepository.saveAll(favProducts);
-	}
-
-	public List<FavProduct> deleteFavoriteProducts(Long userId, FavoriteRequest request) {
-		List<FavProduct> favProducts = new ArrayList<>();
-		for (Long productId : request.getProductIds()) {
-			List<FavProduct> prods = favProductRepository.findFavoriteProductsProductId(productId, userId);
-			favProductRepository.deleteAll(prods);
-			favProducts.addAll(prods);
-		}
-		return favProducts;
-	}
 }

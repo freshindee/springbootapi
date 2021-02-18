@@ -164,6 +164,6 @@ public class OrderService {
     }
 
     public List<String> findAllImages(Long prodId) {
-        return productRepository.findAllImages(prodId);
+        return productRepository.findAllImages(prodId, 4L);
     }
 }

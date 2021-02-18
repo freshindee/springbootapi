@@ -1,14 +1,13 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.services;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.Category;
 import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.CategoryRepository;
 import com.fitscorp.j2eemobileapi.restservices.restservices.repository.SubCategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 
@@ -26,7 +25,7 @@ public class CategoryService {
 	public List<Category> getAllCategory() {
 		List<Category> categories = categoryRepository.findAll();
 		for (Category cat : categories) {
-			List<String> images = findAllImages(cat.getCategoryId());
+			List<String> images = findAllImages(cat.getCategoryId(), 2L);
 			cat.setImages(images);
 		}
 		return categories;
@@ -36,8 +35,8 @@ public class CategoryService {
 		return subCategoryRepository.findAll();
 	}
 
-	public List<String> findAllImages(Long catId) {
-		return categoryRepository.findAllImages(catId);
+	public List<String> findAllImages(Long catId, Long tableDef) {
+		return categoryRepository.findAllImages(catId, tableDef);
 	}
 	
 }

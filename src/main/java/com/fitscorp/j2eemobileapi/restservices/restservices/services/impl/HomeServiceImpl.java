@@ -46,7 +46,7 @@ public class HomeServiceImpl implements HomeService {
         for (SubCategory subCategory : subCategories) {
 			List<Product> products = productRepository.findProductsBySubCategoryId(subCategory.getId());
 			
-        	subCategory.setImages(findAllImages(subCategory.getId()));
+        	subCategory.setImages(findAllImages(subCategory.getId(), 3L));
             for (Product product : products) {
 
                 PromotionDTO p = new PromotionDTO();
@@ -69,7 +69,7 @@ public class HomeServiceImpl implements HomeService {
 
                 p.setIsFavorite(isFavorite);
 
-            	p.setImages(findAllImages(product.getId()));
+            	p.setImages(findAllImages(product.getId(), 3L));
                 promotions.add(p);
 
             }
@@ -83,7 +83,7 @@ public class HomeServiceImpl implements HomeService {
             c.setCategoryId(category.getCategoryId());
             c.setStoreId(category.getStoreId());
             c.setCategoryName(category.getCategoryName());
-        	c.setImages(findAllImages(category.getCategoryId()));
+        	c.setImages(findAllImages(category.getCategoryId(), 2L));
             categories.add(c);
         }
         
@@ -107,7 +107,7 @@ public class HomeServiceImpl implements HomeService {
             p.setPromoStartDate(subCategory.getPromotionStartDate());
             p.setPromoEndDate(subCategory.getPromotionEndDate());
             p.setPromoDescription(subCategory.getPromotionDescription());
-        	p.setImages(findAllImages(product.getId()));
+        	p.setImages(findAllImages(product.getId(), 4L));
 
             Boolean isFavorite = favProductRepository
                     .findIfProductIsFavoriteByProductId(product.getId()) != null;
@@ -124,8 +124,8 @@ public class HomeServiceImpl implements HomeService {
         return homeDTO;
     }
 
-	public List<String> findAllImages(Long catId) {
-		return subCategoryRepository.findAllImages(catId);
+	public List<String> findAllImages(Long catId, Long tableDef) {
+		return subCategoryRepository.findAllImages(catId, tableDef);
 	}
 	
 }

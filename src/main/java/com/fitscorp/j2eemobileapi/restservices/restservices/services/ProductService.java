@@ -275,7 +275,7 @@ public class ProductService {
 	}
 
 	public List<String> findAllImages(Long catId) {
-		return subCategoryRepository.findAllImages(catId);
+		return subCategoryRepository.findAllImages(catId, 4L);
 	}
 
 }

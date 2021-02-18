@@ -1,20 +1,19 @@
 package com.fitscorp.j2eemobileapi.restservices.restservices.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.fitscorp.j2eemobileapi.restservices.restservices.dto.SubCategoryDTO;
+import com.fitscorp.j2eemobileapi.restservices.restservices.dto.SubCategoryWrapperDTO;
+import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
+import com.fitscorp.j2eemobileapi.restservices.restservices.repository.SubCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fitscorp.j2eemobileapi.restservices.restservices.dto.SubCategoryDTO;
-import com.fitscorp.j2eemobileapi.restservices.restservices.dto.SubCategoryWrapperDTO;
-import com.fitscorp.j2eemobileapi.restservices.restservices.entities.SubCategory;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.UserExistsException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.exceptions.NotFoundException;
-import com.fitscorp.j2eemobileapi.restservices.restservices.repository.SubCategoryRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubCategoryService {
@@ -149,7 +148,7 @@ public class SubCategoryService {
 	}
 	
 	public List<String> findAllImages(Long catId) {
-		return subCategoryRepository.findAllImages(catId);
+		return subCategoryRepository.findAllImages(catId, 3L);
 	}
 	
 }

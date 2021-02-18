@@ -22,8 +22,8 @@ public interface ProductRepository  extends JpaRepository<Product, Long> {
 	@Query(value="SELECT * FROM product WHERE sub_category_id = 0 ORDER BY created_date DESC", nativeQuery=true)
 	List<Product> findAllPromotions();
 
-	@Query(nativeQuery = true, value = "SELECT name FROM file WHERE table_id = :productId")
-	List<String> findAllImages(Long productId);
+	@Query(nativeQuery = true, value = "SELECT name FROM file WHERE table_id = :productId AND table_def = :tableDef")
+	List<String> findAllImages(Long productId, Long tableDef);
 
 	@Query(value="SELECT p FROM Product p WHERE p.name LIKE %?1%",
 			countQuery = "SELECT count(p) FROM Product p WHERE p.name LIKE %?1%")

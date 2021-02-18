@@ -13,11 +13,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>restservices</name>
 	<description>jassexpress project for Spring Boot</description>
-
+ <!--    <packaging>war</packaging> -->
     <properties>
         <java.version>1.8</java.version>
     </properties>
-
+   
+    
+    
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -96,7 +98,14 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-        <finalName>spring_boot_aws_exe</finalName>
+        <finalName>spring_boot_aws_api</finalName>
+        <!-- 
+         <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+          </resource>
+         </resources> -->
+    
     </build>
 
 </project>

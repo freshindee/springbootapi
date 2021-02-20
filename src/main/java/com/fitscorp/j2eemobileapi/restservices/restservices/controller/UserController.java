@@ -210,6 +210,7 @@ public class UserController {
 			user.getPasswordStatus(),
 			user.getStatus(),
 			new Settings(new BigDecimal(30.0)), //TODO: hard coded delivery fee
+			userService.getUserImage(user.getUserId()),
 			accessToken,
 			refreshToken
 		);

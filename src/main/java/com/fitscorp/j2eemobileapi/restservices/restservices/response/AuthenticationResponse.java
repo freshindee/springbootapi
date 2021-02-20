@@ -16,6 +16,7 @@ public class AuthenticationResponse {
 	private Settings settings;
 	private String accessToken;
 	private String refreshToken;
+	private String imageUrl;
 	
 	public AuthenticationResponse() {
 	}
@@ -26,7 +27,7 @@ public class AuthenticationResponse {
 	}
 
 	public AuthenticationResponse(Long userId, String name, String password, String phoneNo, String deliveryAddress,
-			String email, int passwordStatus, int status, Settings settings, String accessToken, String refreshToken) {
+			String email, int passwordStatus, int status, Settings settings, String imageUrl, String accessToken, String refreshToken) {
 		this.userId = userId;
 		this.name = name;
 		this.password = password;
@@ -36,6 +37,7 @@ public class AuthenticationResponse {
 		this.passwordStatus = passwordStatus;
 		this.status = status;
 		this.settings = settings;
+		this.imageUrl = imageUrl;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 	}
@@ -124,5 +126,12 @@ public class AuthenticationResponse {
 	public void setSettings(Settings settings) {
 		this.settings = settings;
 	}
-	
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 }

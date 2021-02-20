@@ -26,6 +26,9 @@ public interface UserRepository  extends JpaRepository<User, Long>{
 
 	@Query(nativeQuery = true, value = "SELECT is_email_verified FROM user WHERE email_address = :email")
 	Boolean findUserEmailVerified(String email);
+
+	@Query(nativeQuery = true, value = "SELECT path FROM file WHERE table_id = :userId AND table_def = 1 LIMIT 1")
+	String findImage(Long userId);
 }
 
 

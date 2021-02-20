@@ -137,6 +137,7 @@ public class UserService {
 					user.getPasswordStatus(),
 					user.getStatus(),
 					new Settings(new BigDecimal(30.0)),
+					getUserImage(user.getUserId()),
 					null,
 					null
 			);
@@ -151,6 +152,10 @@ public class UserService {
 			e.printStackTrace();
 			return new AuthenticationResponse();
 		}
+	}
+
+	public String getUserImage(Long userId) {
+		return userRepository.findImage(userId);
 	}
 
 	public boolean checkAccountActivation(Long userId) throws UserNotActivatedException, NotFoundException {

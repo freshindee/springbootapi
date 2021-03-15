@@ -49,9 +49,12 @@ public class Product implements Serializable {
     private Date modifiedDate;
     @Column(name = "sub_category_id")
     private Long subCategoryId;
-    @Transient
-    @ElementCollection(targetClass=String.class)
-    List<String> images;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<ProductImage> images;
+//    @Transient
+//    @ElementCollection(targetClass=String.class)
+//    List<String> images;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
 //    private List<FavProduct> favProductList;
 //    @JoinColumn(name = "sub_category_id", referencedColumnName = "id")
@@ -181,11 +184,11 @@ public class Product implements Serializable {
 //        this.orderProductList = orderProductList;
 //    }
 
-    public List<String> getImages() {
+    public List<ProductImage> getImages() {
 		return images;
 	}
 
-	public void setImages(List<String> images) {
+	public void setImages(List<ProductImage> images) {
 		this.images = images;
 	}
 

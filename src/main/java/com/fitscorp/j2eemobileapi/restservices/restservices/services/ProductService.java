@@ -50,8 +50,13 @@ public class ProductService {
 	public Product getProductById(Long id) {
 		Optional<Product> prod = productRepository.findById(id);
 		if (prod.isPresent()) {
-			List<String> images = findAllImages(prod.get().getId());
-			prod.get().setImages(images);
+//			List<String> images = findAllImages(prod.get().getId());
+//			prod.get().setImages(images);
+
+			List<String> images = new ArrayList<>();
+			for (ProductImage im : prod.get().getImages()) {
+				images.add(im.getPath());
+			}
 
 			return prod.get();
 		}
@@ -75,8 +80,8 @@ public class ProductService {
 		}
 		
 		for (Product product : products) {
-			List<String> images = findAllImages(product.getId());
-			product.setImages(images);
+//			List<String> images = findAllImages(product.getId());
+//			product.setImages(images);
 
 			Boolean isFavorite = favProductRepository
 					.findIfProductIsFavoriteByProductId(product.getId()) != null;
@@ -99,8 +104,13 @@ public class ProductService {
 			List<Product> products = productRepository.findProductsBySubCategoryId(subCat.getId());
 			
 			for (Product product : products) {
-				List<String> images = findAllImages(product.getId());
-				product.setImages(images);
+//				List<String> images = findAllImages(product.getId());
+//				product.setImages(images);
+
+				List<String> images = new ArrayList<>();
+				for (ProductImage im : product.getImages()) {
+					images.add(im.getPath());
+				}
 
 				Boolean isFavorite = favProductRepository
 						.findIfProductIsFavoriteByProductId(product.getId()) != null;
@@ -120,7 +130,7 @@ public class ProductService {
 					product.getDiscountedPrice(), 
 					product.getUnit(),
 					isFavorite,
-					product.getImages()
+					images
 				);
 				promos.add(promo);
 			}
@@ -153,8 +163,13 @@ public class ProductService {
 				throw new NotFoundException("Not found");
 			}
 			
-			List<String> images = findAllImages(product.getId());
-			product.setImages(images);
+//			List<String> images = findAllImages(product.getId());
+//			product.setImages(images);
+
+			List<String> images = new ArrayList<>();
+			for (ProductImage im : product.getImages()) {
+				images.add(im.getPath());
+			}
 
 			ProductDTO prod = getProductDTO(subCat, cat, product, true);
 			productDtos.add(prod);
@@ -188,8 +203,13 @@ public class ProductService {
 					throw new NotFoundException("Not found");
 				}
 
-				List<String> images = findAllImages(product.get().getId());
-				product.get().setImages(images);
+//				List<String> images = findAllImages(product.get().getId());
+//				product.get().setImages(images);
+
+				List<String> images = new ArrayList<>();
+				for (ProductImage im : product.get().getImages()) {
+					images.add(im.getPath());
+				}
 
 				ProductDTO prod = getProductDTO(subCat, cat, product.get(), true);
 				productDtos.add(prod);
@@ -257,6 +277,10 @@ public class ProductService {
 	}
 
 	private ProductDTO getProductDTO(SubCategory subCat, Category cat, Product product, boolean b) {
+		List<String> images = new ArrayList<>();
+		for (ProductImage im : product.getImages()) {
+			images.add(im.getPath());
+		}
 		return new ProductDTO(
 				subCat.getCategoryId(),
 				subCat.getStoreId(),
@@ -270,7 +294,7 @@ public class ProductService {
 				product.getDiscountedPrice(),
 				product.getUnit(),
 				b,
-				product.getImages()
+				images
 		);
 	}
 

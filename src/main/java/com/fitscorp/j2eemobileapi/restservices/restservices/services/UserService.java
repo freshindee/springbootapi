@@ -121,7 +121,6 @@ public class UserService {
 		return String.format("%06d", number);
 	}
 
-
 	public Object getUserInfo(Long userId) {
 		try {
 			User user = getUserByUserId(userId);
